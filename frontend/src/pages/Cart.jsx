@@ -104,14 +104,10 @@ const Cart = () => {
                 </div>
               </div>
               <button
-                onClick={() => {
-                  alert('Order placed successfully! (This is a demo)');
-                  clearCart();
-                  navigate('/');
-                }}
-                className="w-full bg-yellow-400 text-gray-900 py-3 rounded-md hover:bg-yellow-500 transition font-semibold text-lg mb-4"
+                onClick={() => navigate('/checkout')}
+                className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition font-semibold text-lg mb-4"
               >
-                Place Order
+                Proceed to Checkout
               </button>
               <Link
                 to="/"

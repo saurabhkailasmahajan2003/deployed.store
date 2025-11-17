@@ -13,12 +13,85 @@ const categoryOptions = [
 
 const statusOptions = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
+// Subcategory options based on category
+const subCategoryOptions = {
+  men: ['shirt', 'tshirt', 'jeans', 'trousers'],
+  women: ['shirt', 'tshirt', 'jeans', 'trousers'],
+  watches: ['analog', 'digital', 'smartwatch', 'sports', 'luxury'],
+  lens: ['reading', 'sunglasses', 'computer', 'blue-light', 'progressive'],
+  accessories: ['belt', 'wallet', 'bag', 'cap', 'watch-strap'],
+};
+
+// SVG Icons
+const IconDashboard = (props) => (
+  <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+  </svg>
+);
+
+const IconProducts = (props) => (
+  <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+  </svg>
+);
+
+const IconAdd = (props) => (
+  <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+  </svg>
+);
+
+const IconEdit = (props) => (
+  <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+  </svg>
+);
+
+const IconDelete = (props) => (
+  <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  </svg>
+);
+
+const IconOrders = (props) => (
+  <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+  </svg>
+);
+
+const IconStatus = (props) => (
+  <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  </svg>
+);
+
+const IconUsers = (props) => (
+  <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+  </svg>
+);
+
+// Sidebar menu items
+const menuItems = [
+  { id: 'dashboard', label: 'Dashboard', icon: IconDashboard },
+  { id: 'products', label: 'View Products', icon: IconProducts },
+  { id: 'add-product', label: 'Add Product', icon: IconAdd },
+  { id: 'edit-product', label: 'Edit Product', icon: IconEdit },
+  { id: 'delete-product', label: 'Delete Product', icon: IconDelete },
+  { id: 'orders', label: 'Manage Orders', icon: IconOrders },
+  { id: 'order-status', label: 'Order Status', icon: IconStatus },
+  { id: 'users', label: 'Manage Users', icon: IconUsers },
+];
+
 const AdminDashboard = () => {
   const { user, isLoading } = useAuth();
   const [summary, setSummary] = useState(null);
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [activeSection, setActiveSection] = useState('dashboard');
   const [productCategory, setProductCategory] = useState('men');
+  const [editingProduct, setEditingProduct] = useState(null);
   const [productForm, setProductForm] = useState({
     category: 'men',
     name: '',
@@ -29,6 +102,10 @@ const AdminDashboard = () => {
     subCategory: '',
     stock: 10,
     images: '',
+    description: '',
+    isNewArrival: false,
+    onSale: false,
+    isFeatured: false,
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -37,14 +114,17 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (!isAdmin) return;
-    fetchSummary();
-    fetchOrders();
-  }, [isAdmin]);
-
-  useEffect(() => {
-    if (!isAdmin) return;
-    fetchProducts(productCategory);
-  }, [isAdmin, productCategory]);
+    if (activeSection === 'dashboard' || activeSection === 'orders' || activeSection === 'order-status') {
+      fetchSummary();
+      fetchOrders();
+    }
+    if (activeSection === 'products' || activeSection === 'add-product' || activeSection === 'edit-product' || activeSection === 'delete-product') {
+      fetchProducts(productCategory);
+    }
+    if (activeSection === 'users') {
+      fetchUsers();
+    }
+  }, [isAdmin, activeSection, productCategory]);
 
   const fetchSummary = async () => {
     try {
@@ -82,6 +162,19 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      // This would need to be implemented in the backend
+      // For now, we'll just show a placeholder
+      setUsers([]);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOrderStatusChange = async (orderId, status) => {
     try {
       await adminAPI.updateOrderStatus(orderId, status);
@@ -104,8 +197,18 @@ const AdminDashboard = () => {
   };
 
   const handleProductFormChange = (e) => {
-    const { name, value } = e.target;
-    setProductForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setProductForm((prev) => {
+      const updated = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      };
+      // Reset subCategory when category changes
+      if (name === 'category') {
+        updated.subCategory = '';
+      }
+      return updated;
+    });
   };
 
   const resetForm = () => {
@@ -119,7 +222,32 @@ const AdminDashboard = () => {
       subCategory: '',
       stock: 10,
       images: '',
+      description: '',
+      isNewArrival: false,
+      onSale: false,
+      isFeatured: false,
     });
+    setEditingProduct(null);
+  };
+
+  const handleEditProduct = (product) => {
+    setEditingProduct(product);
+    setProductForm({
+      category: product.category || productCategory,
+      name: product.name || '',
+      brand: product.brand || '',
+      price: product.price || product.finalPrice || '',
+      originalPrice: product.originalPrice || product.price || '',
+      discountPercent: product.discountPercent || 0,
+      subCategory: product.subCategory || '',
+      stock: product.stock || 10,
+      images: product.images?.join(', ') || '',
+      description: product.description || '',
+      isNewArrival: product.isNewArrival || false,
+      onSale: product.onSale || false,
+      isFeatured: product.isFeatured || false,
+    });
+    setActiveSection('edit-product');
   };
 
   const handleCreateProduct = async (e) => {
@@ -141,6 +269,30 @@ const AdminDashboard = () => {
       fetchProducts(productCategory);
     } catch (error) {
       setMessage({ type: 'error', text: error.message || 'Failed to create product' });
+    }
+  };
+
+  const handleUpdateProduct = async (e) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    try {
+      const payload = {
+        ...productForm,
+        price: Number(productForm.price),
+        originalPrice: Number(productForm.originalPrice || productForm.price),
+        discountPercent: Number(productForm.discountPercent || 0),
+        stock: Number(productForm.stock || 0),
+        images: productForm.images
+          ? productForm.images.split(',').map((img) => img.trim())
+          : [],
+      };
+      await adminAPI.updateProduct(editingProduct._id, { ...payload, category: productCategory });
+      setMessage({ type: 'success', text: 'Product updated' });
+      resetForm();
+      fetchProducts(productCategory);
+      setActiveSection('products');
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message || 'Failed to update product' });
     }
   };
 
@@ -186,142 +338,61 @@ const AdminDashboard = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-slate-100 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-gray-500">Control Center</p>
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          </div>
-          <div className="flex gap-2">
-            <Link
-              to="/"
-              className="px-4 py-2 rounded-lg border text-sm font-semibold text-gray-600 hover:bg-gray-50"
-            >
-              Back to store
-            </Link>
-            <button
-              onClick={fetchSummary}
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700"
-            >
-              Refresh
-            </button>
-          </div>
-        </div>
-
-        {message.text && (
-          <div
-            className={`rounded-lg px-4 py-3 text-sm ${
-              message.type === 'error'
-                ? 'bg-red-50 text-red-700 border border-red-200'
-                : 'bg-green-50 text-green-700 border border-green-200'
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
-
-        <section className="grid gap-4 md:grid-cols-4">
-          {summary ? (
-            <>
-              <div className="bg-white rounded-2xl border p-5 shadow-sm">
-                <p className="text-xs uppercase text-gray-500">Revenue</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  ₹{summary.totalRevenue.toLocaleString()}
-                </p>
-              </div>
-              <div className="bg-white rounded-2xl border p-5 shadow-sm">
-                <p className="text-xs uppercase text-gray-500">Orders</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{summary.totalOrders}</p>
-                <p className="text-xs text-gray-500">{summary.pendingOrders} pending</p>
-              </div>
-              <div className="bg-white rounded-2xl border p-5 shadow-sm">
-                <p className="text-xs uppercase text-gray-500">Customers</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{summary.totalUsers}</p>
-              </div>
-              <div className="bg-white rounded-2xl border p-5 shadow-sm">
-                <p className="text-xs uppercase text-gray-500">Inventory</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  {Object.values(summary.inventory).reduce((a, b) => a + b, 0)}
-                </p>
-              </div>
-            </>
-          ) : (
-            <p className="text-gray-500 text-sm">Loading summary...</p>
-          )}
-        </section>
-
-        <section className="grid gap-6 lg:grid-cols-2">
-          <div className="bg-white rounded-3xl border p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-xs uppercase text-gray-500">Recent orders</p>
-                <h2 className="text-xl font-bold text-gray-900">Orders & Status</h2>
-              </div>
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'dashboard':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Dashboard Overview</h2>
               <button
-                onClick={fetchOrders}
-                className="text-sm text-blue-600 font-semibold hover:text-blue-700"
+                onClick={fetchSummary}
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700"
               >
                 Refresh
               </button>
             </div>
-            <div className="divide-y">
-              {filteredOrders.length === 0 && (
-                <p className="text-gray-500 text-sm py-4">No orders yet</p>
+            <div className="grid gap-4 md:grid-cols-4">
+              {summary ? (
+                <>
+                  <div className="bg-white rounded-2xl border p-5 shadow-sm">
+                    <p className="text-xs uppercase text-gray-500">Revenue</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-2">
+                      ₹{summary.totalRevenue.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-2xl border p-5 shadow-sm">
+                    <p className="text-xs uppercase text-gray-500">Orders</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-2">{summary.totalOrders}</p>
+                    <p className="text-xs text-gray-500">{summary.pendingOrders} pending</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border p-5 shadow-sm">
+                    <p className="text-xs uppercase text-gray-500">Customers</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-2">{summary.totalUsers}</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border p-5 shadow-sm">
+                    <p className="text-xs uppercase text-gray-500">Inventory</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-2">
+                      {Object.values(summary.inventory).reduce((a, b) => a + b, 0)}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-gray-500 text-sm">Loading summary...</p>
               )}
-              {filteredOrders.map((order) => (
-                <div key={order._id} className="py-4 flex flex-col gap-2">
-                  <div className="flex justify-between text-sm">
-                    <div>
-                      <p className="font-semibold text-gray-900">
-                        {order.user?.name || 'Guest'} · ₹{order.totalAmount?.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        #{order._id.slice(-6)} · {new Date(order.orderDate).toDateString()}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteOrder(order._id)}
-                      className="text-xs text-red-500 hover:text-red-600"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={order.status}
-                      onChange={(e) => handleOrderStatusChange(order._id, e.target.value)}
-                      className="text-sm border rounded-lg px-3 py-1.5"
-                    >
-                      {statusOptions.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="text-xs text-gray-500">
-                      {order.items?.length || 0} item(s)
-                    </span>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
+        );
 
-          <div className="bg-white rounded-3xl border p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-xs uppercase text-gray-500">Inventory</p>
-                <h2 className="text-xl font-bold text-gray-900">Manage Products</h2>
-              </div>
+      case 'products':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">View Products</h2>
               <select
                 value={productCategory}
-                onChange={(e) => {
-                  setProductCategory(e.target.value);
-                  setProductForm((prev) => ({ ...prev, category: e.target.value }));
-                }}
-                className="border rounded-lg px-3 py-1.5 text-sm"
+                onChange={(e) => setProductCategory(e.target.value)}
+                className="border rounded-lg px-3 py-2 text-sm"
               >
                 {categoryOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -330,112 +401,668 @@ const AdminDashboard = () => {
                 ))}
               </select>
             </div>
-            <form onSubmit={handleCreateProduct} className="space-y-3 mb-6">
-              <input
-                name="name"
-                value={productForm.name}
-                onChange={handleProductFormChange}
-                placeholder="Product name"
-                required
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  name="brand"
-                  value={productForm.brand}
+            {loading ? (
+              <p className="text-sm text-gray-500">Loading products...</p>
+            ) : products.length === 0 ? (
+              <p className="text-sm text-gray-500">No products in this category yet.</p>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {products.map((product) => (
+                  <div key={product._id} className="bg-white rounded-xl border p-4">
+                    {product.images?.[0] && (
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-full h-48 object-cover rounded-lg mb-3"
+                      />
+                    )}
+                    <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                    <p className="text-sm text-gray-600">{product.brand}</p>
+                    <p className="text-lg font-bold text-gray-900 mt-2">
+                      ₹{product.finalPrice || product.price}
+                    </p>
+                    <p className="text-xs text-gray-500">Stock: {product.stock}</p>
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="flex-1 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product._id)}
+                        className="flex-1 px-3 py-1.5 text-xs bg-red-600 text-white rounded-lg hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+
+      case 'add-product':
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">Add New Product</h2>
+            <form onSubmit={handleCreateProduct} className="bg-white rounded-xl border p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select
+                    name="category"
+                    value={productForm.category}
+                    onChange={handleProductFormChange}
+                    required
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                  >
+                    {categoryOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
+                  <select
+                    name="subCategory"
+                    value={productForm.subCategory}
+                    onChange={handleProductFormChange}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    required
+                  >
+                    <option value="">Select Sub Category</option>
+                    {subCategoryOptions[productForm.category]?.map((subCat) => (
+                      <option key={subCat} value={subCat}>
+                        {subCat.charAt(0).toUpperCase() + subCat.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                  <input
+                    name="name"
+                    value={productForm.name}
+                    onChange={handleProductFormChange}
+                    required
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    placeholder="Product name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                  <input
+                    name="brand"
+                    value={productForm.brand}
+                    onChange={handleProductFormChange}
+                    required
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    placeholder="Brand name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                  <input
+                    name="price"
+                    type="number"
+                    min="0"
+                    value={productForm.price}
+                    onChange={handleProductFormChange}
+                    required
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (₹)</label>
+                  <input
+                    name="originalPrice"
+                    type="number"
+                    min="0"
+                    value={productForm.originalPrice}
+                    onChange={handleProductFormChange}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                  <input
+                    name="stock"
+                    type="number"
+                    min="0"
+                    value={productForm.stock}
+                    onChange={handleProductFormChange}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
+                  <input
+                    name="discountPercent"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={productForm.discountPercent}
+                    onChange={handleProductFormChange}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Image URLs (comma separated)</label>
+                <textarea
+                  name="images"
+                  value={productForm.images}
                   onChange={handleProductFormChange}
-                  placeholder="Brand"
-                  required
-                  className="border rounded-lg px-3 py-2 text-sm"
-                />
-                <input
-                  name="subCategory"
-                  value={productForm.subCategory}
-                  onChange={handleProductFormChange}
-                  placeholder="Sub-category"
-                  className="border rounded-lg px-3 py-2 text-sm"
+                  rows="3"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
                 />
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <input
-                  name="price"
-                  type="number"
-                  min="0"
-                  value={productForm.price}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  name="description"
+                  value={productForm.description}
                   onChange={handleProductFormChange}
-                  placeholder="Price"
-                  required
-                  className="border rounded-lg px-3 py-2 text-sm"
-                />
-                <input
-                  name="originalPrice"
-                  type="number"
-                  min="0"
-                  value={productForm.originalPrice}
-                  onChange={handleProductFormChange}
-                  placeholder="Original price"
-                  className="border rounded-lg px-3 py-2 text-sm"
-                />
-                <input
-                  name="stock"
-                  type="number"
-                  min="0"
-                  value={productForm.stock}
-                  onChange={handleProductFormChange}
-                  placeholder="Stock"
-                  className="border rounded-lg px-3 py-2 text-sm"
+                  rows="3"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  placeholder="Product description"
                 />
               </div>
-              <textarea
-                name="images"
-                value={productForm.images}
-                onChange={handleProductFormChange}
-                placeholder="Image URLs (comma separated)"
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-              />
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-blue-600 text-white text-sm font-semibold py-2.5 hover:bg-blue-700"
-              >
-                Add Product
-              </button>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="isNewArrival"
+                    checked={productForm.isNewArrival}
+                    onChange={handleProductFormChange}
+                    className="rounded"
+                  />
+                  <span className="text-sm text-gray-700">New Arrival</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="onSale"
+                    checked={productForm.onSale}
+                    onChange={handleProductFormChange}
+                    className="rounded"
+                  />
+                  <span className="text-sm text-gray-700">On Sale</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="isFeatured"
+                    checked={productForm.isFeatured}
+                    onChange={handleProductFormChange}
+                    className="rounded"
+                  />
+                  <span className="text-sm text-gray-700">Featured</span>
+                </label>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
+                >
+                  Add Product
+                </button>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+                >
+                  Reset
+                </button>
+              </div>
             </form>
-            <div className="h-48 overflow-y-auto pr-1">
-              {loading ? (
-                <p className="text-sm text-gray-500">Loading products...</p>
-              ) : products.length === 0 ? (
-                <p className="text-sm text-gray-500">No products in this category yet.</p>
-              ) : (
-                <ul className="space-y-3 text-sm">
-                  {products.slice(0, 6).map((product) => (
-                    <li
-                      key={product._id}
-                      className="flex items-center justify-between border rounded-xl px-3 py-2"
+          </div>
+        );
+
+      case 'edit-product':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Edit Product</h2>
+              <select
+                value={productCategory}
+                onChange={(e) => setProductCategory(e.target.value)}
+                className="border rounded-lg px-3 py-2 text-sm"
+              >
+                {categoryOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {editingProduct ? (
+              <form onSubmit={handleUpdateProduct} className="bg-white rounded-xl border p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select
+                      name="category"
+                      value={productForm.category}
+                      onChange={handleProductFormChange}
+                      required
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
                     >
-                      <div>
-                        <p className="font-semibold text-gray-900 line-clamp-1">{product.name}</p>
-                        <p className="text-xs text-gray-500">
-                          ₹{product.finalPrice || product.price} · Stock {product.stock}
+                      {categoryOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
+                    <select
+                      name="subCategory"
+                      value={productForm.subCategory}
+                      onChange={handleProductFormChange}
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      required
+                    >
+                      <option value="">Select Sub Category</option>
+                      {subCategoryOptions[productForm.category]?.map((subCat) => (
+                        <option key={subCat} value={subCat}>
+                          {subCat.charAt(0).toUpperCase() + subCat.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                    <input
+                      name="name"
+                      value={productForm.name}
+                      onChange={handleProductFormChange}
+                      required
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                    <input
+                      name="brand"
+                      value={productForm.brand}
+                      onChange={handleProductFormChange}
+                      required
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                    <input
+                      name="price"
+                      type="number"
+                      min="0"
+                      value={productForm.price}
+                      onChange={handleProductFormChange}
+                      required
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (₹)</label>
+                    <input
+                      name="originalPrice"
+                      type="number"
+                      min="0"
+                      value={productForm.originalPrice}
+                      onChange={handleProductFormChange}
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                    <input
+                      name="stock"
+                      type="number"
+                      min="0"
+                      value={productForm.stock}
+                      onChange={handleProductFormChange}
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
+                    <input
+                      name="discountPercent"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={productForm.discountPercent}
+                      onChange={handleProductFormChange}
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Image URLs (comma separated)</label>
+                  <textarea
+                    name="images"
+                    value={productForm.images}
+                    onChange={handleProductFormChange}
+                    rows="3"
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    name="description"
+                    value={productForm.description}
+                    onChange={handleProductFormChange}
+                    rows="3"
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="isNewArrival"
+                      checked={productForm.isNewArrival}
+                      onChange={handleProductFormChange}
+                      className="rounded"
+                    />
+                    <span className="text-sm text-gray-700">New Arrival</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="onSale"
+                      checked={productForm.onSale}
+                      onChange={handleProductFormChange}
+                      className="rounded"
+                    />
+                    <span className="text-sm text-gray-700">On Sale</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="isFeatured"
+                      checked={productForm.isFeatured}
+                      onChange={handleProductFormChange}
+                      className="rounded"
+                    />
+                    <span className="text-sm text-gray-700">Featured</span>
+                  </label>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
+                  >
+                    Update Product
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      resetForm();
+                      setActiveSection('products');
+                    }}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="bg-white rounded-xl border p-6 text-center">
+                <p className="text-gray-600">Select a product from "View Products" to edit</p>
+                <button
+                  onClick={() => setActiveSection('products')}
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  View Products
+                </button>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'delete-product':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Delete Products</h2>
+              <select
+                value={productCategory}
+                onChange={(e) => setProductCategory(e.target.value)}
+                className="border rounded-lg px-3 py-2 text-sm"
+              >
+                {categoryOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {loading ? (
+              <p className="text-sm text-gray-500">Loading products...</p>
+            ) : products.length === 0 ? (
+              <p className="text-sm text-gray-500">No products in this category yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {products.map((product) => (
+                  <div
+                    key={product._id}
+                    className="bg-white rounded-xl border p-4 flex items-center justify-between"
+                  >
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                      <p className="text-sm text-gray-600">{product.brand}</p>
+                      <p className="text-sm text-gray-500">₹{product.finalPrice || product.price}</p>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+
+      case 'orders':
+      case 'order-status':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {activeSection === 'orders' ? 'Manage Orders' : 'Order Status Management'}
+              </h2>
+              <button
+                onClick={fetchOrders}
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700"
+              >
+                Refresh
+              </button>
+            </div>
+            <div className="bg-white rounded-xl border divide-y">
+              {orders.length === 0 ? (
+                <p className="text-gray-500 text-sm py-4 px-6">No orders yet</p>
+              ) : (
+                orders.map((order) => (
+                  <div key={order._id} className="p-6 flex flex-col gap-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <p className="font-semibold text-gray-900">
+                            Order #{order._id?.slice(-8)?.toUpperCase() || 'N/A'}
+                          </p>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              order.status === 'delivered'
+                                ? 'bg-green-100 text-green-700'
+                                : order.status === 'shipped'
+                                ? 'bg-blue-100 text-blue-700'
+                                : order.status === 'processing'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : order.status === 'cancelled'
+                                ? 'bg-red-100 text-red-700'
+                                : 'bg-gray-100 text-gray-700'
+                            }`}
+                          >
+                            {order.status?.charAt(0).toUpperCase() + order.status?.slice(1) || 'Pending'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Customer: {order.user?.name || 'Guest'} ({order.user?.email || 'N/A'})
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Date: {new Date(order.orderDate || order.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </p>
+                        <p className="text-sm font-semibold text-gray-900 mt-1">
+                          Total: ₹{order.totalAmount?.toLocaleString() || '0'} · {order.items?.length || 0} item(s)
                         </p>
                       </div>
                       <button
-                        onClick={() => handleDeleteProduct(product._id)}
-                        className="text-xs text-red-500 hover:text-red-600"
+                        onClick={() => handleDeleteOrder(order._id)}
+                        className="text-xs text-red-500 hover:text-red-600 font-semibold px-3 py-1 border border-red-200 rounded-lg hover:bg-red-50"
                       >
-                        Remove
+                        Delete
                       </button>
-                    </li>
-                  ))}
-                </ul>
+                    </div>
+                    <div className="border-t pt-4">
+                      <div className="flex items-center gap-4 mb-3">
+                        <label className="text-sm font-semibold text-gray-700">Update Status:</label>
+                        <select
+                          value={order.status || 'pending'}
+                          onChange={(e) => handleOrderStatusChange(order._id, e.target.value)}
+                          className="text-sm border rounded-lg px-4 py-2 flex-1 max-w-xs"
+                        >
+                          {statusOptions.map((status) => (
+                            <option key={status} value={status}>
+                              {status.charAt(0).toUpperCase() + status.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="mt-4">
+                        <h4 className="text-sm font-semibold text-gray-900 mb-2">Order Items:</h4>
+                        <div className="space-y-2">
+                          {order.items?.map((item, index) => (
+                            <div key={index} className="flex items-center gap-3 text-sm">
+                              {item.product?.images?.[0] && (
+                                <img
+                                  src={item.product.images[0]}
+                                  alt={item.product.name}
+                                  className="w-12 h-12 object-cover rounded"
+                                />
+                              )}
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-900">{item.product?.name || 'Product'}</p>
+                                <p className="text-xs text-gray-600">
+                                  Qty: {item.quantity} · ₹{item.price?.toLocaleString()} each
+                                </p>
+                              </div>
+                              <p className="font-semibold text-gray-900">
+                                ₹{(item.price * item.quantity).toLocaleString()}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           </div>
-        </section>
-      </div>
+        );
+
+      case 'users':
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">Manage Users</h2>
+            <div className="bg-white rounded-xl border p-6">
+              <p className="text-gray-600">
+                User management functionality will be available soon. This feature requires backend implementation.
+              </p>
+            </div>
+          </div>
+        );
+
+      default:
+        return <div>Section not found</div>;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r border-gray-200 flex-shrink-0 min-h-screen sticky top-0">
+        <div className="p-4 border-b border-gray-200">
+          <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
+          <p className="text-xs text-gray-500 mt-1">Control Center</p>
+        </div>
+        <nav className="p-2">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setActiveSection(item.id);
+                setMessage({ type: '', text: '' });
+              }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors mb-1 ${
+                activeSection === item.id
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <item.icon className={`w-5 h-5 ${activeSection === item.id ? 'text-white' : 'text-gray-600'}`} />
+              <span className="font-medium">{item.label}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="p-4 border-t border-gray-200 mt-auto">
+          <Link
+            to="/"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>Back to Store</span>
+          </Link>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-x-hidden">
+        <div className="p-6">
+          {message.text && (
+            <div
+              className={`rounded-lg px-4 py-3 text-sm mb-6 ${
+                message.type === 'error'
+                  ? 'bg-red-50 text-red-700 border border-red-200'
+                  : 'bg-green-50 text-green-700 border border-green-200'
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
+          {renderContent()}
+        </div>
+      </main>
     </div>
   );
 };
 
 export default AdminDashboard;
-
-

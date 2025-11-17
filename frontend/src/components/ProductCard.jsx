@@ -189,7 +189,7 @@ const ProductCard = ({ product }) => {
           }`}
         >
           {/* Brand Name and Category */}
-          <div className="flex items-center gap-2 mb-1 flex-shrink-0">
+          <div className="hidden sm:flex items-center gap-2 mb-1 flex-shrink-0">
             <div className="text-xs font-semibold text-gray-500 uppercase">
               {brand}
             </div>
@@ -204,13 +204,13 @@ const ProductCard = ({ product }) => {
           </div>
 
           {/* Product Name - Full text visible */}
-          <h3 className="text-sm font-medium text-gray-900 mb-1 flex-shrink-0">
+          <h3 className="text-xs sm:text-sm font-medium text-gray-900 mb-1 flex-shrink-0">
             {product.name}
           </h3>
 
           {/* Rating and Reviews */}
           {product.rating && (
-            <div className="flex items-center gap-1 mb-2 flex-shrink-0">
+            <div className="hidden sm:flex items-center gap-1 mb-2 flex-shrink-0">
               <div className="flex items-center">
                 <svg className="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 20 20">
                   <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
@@ -225,16 +225,16 @@ const ProductCard = ({ product }) => {
 
           {/* Price - Always visible */}
           <div className="mb-2 flex-shrink-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-base font-bold text-gray-900">
+            <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+              <span className="text-sm sm:text-base font-bold text-gray-900">
                 ₹{finalPrice.toLocaleString()}
               </span>
               {originalPrice > finalPrice && (
                 <>
-                  <span className="text-xs text-gray-500 line-through">
+                  <span className="text-[10px] sm:text-xs text-gray-500 line-through">
                     ₹{originalPrice.toLocaleString()}
                   </span>
-                  <span className="text-xs font-semibold text-green-600">
+                  <span className="text-[10px] sm:text-xs font-semibold text-green-600">
                     {discount}% off
                   </span>
                 </>

@@ -23,7 +23,7 @@ const Home = () => {
       title: 'Diwali Special Deals',
       price: 'Up to 70% OFF',
       description: 'Celebrate Diwali with Amazing Discounts on Fashion & Accessories',
-      image: 'https://res.cloudinary.com/dbt2bu4tg/image/upload/v1763314950/Red_Tan_and_Black_Modern_Fashion_Sale_Banner_Landscape_1080_x_300_mm_2_htuw5b.png',
+      image: 'https://res.cloudinary.com/dbt2bu4tg/image/upload/v1763401012/Beige_Modern_Watch_Collection_Sale_LinkedIn_Post_1080_x_300_px_cwyx08.svg',
       link: '/men',
       bgGradient: 'from-green-500 via-yellow-500 to-green-600'
     },
@@ -39,7 +39,7 @@ const Home = () => {
       title: 'Lenses & Spectacles',
       price: '₹1499',
       description: 'Trendy Eyewear for Every Style',
-      image: 'https://res.cloudinary.com/dbt2bu4tg/image/upload/v1763311112/Black_Simple_Watch_Promotion_Advert_Web_Banner_1080_x_300_mm_dusvtn.png',
+      image: 'https://res.cloudinary.com/dbt2bu4tg/image/upload/v1763314950/Red_Tan_and_Black_Modern_Fashion_Sale_Banner_Landscape_1080_x_300_mm_2_htuw5b.png',
       link: '/lenses',
       bgGradient: 'from-purple-500 via-purple-600 to-purple-700'
     },
@@ -247,7 +247,7 @@ const Home = () => {
               View All →
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => (
               <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
             ))}
@@ -265,7 +265,7 @@ const Home = () => {
                 View All →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {newArrivals.map((product) => (
                 <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
               ))}
@@ -284,7 +284,7 @@ const Home = () => {
                 View All →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {menItems.map((product) => (
                 <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
               ))}
@@ -303,7 +303,7 @@ const Home = () => {
                 View All →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {saleItems.map((product) => (
                 <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
               ))}
@@ -322,7 +322,7 @@ const Home = () => {
                 View All →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {womenItems.map((product) => (
                 <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
               ))}
@@ -341,7 +341,7 @@ const Home = () => {
                 View All →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {watches.map((product) => (
                 <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
               ))}
@@ -360,7 +360,7 @@ const Home = () => {
                 View All →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {lenses.map((product) => (
                 <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
               ))}
@@ -379,7 +379,7 @@ const Home = () => {
                 View All →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {accessories.map((product) => (
                 <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
               ))}

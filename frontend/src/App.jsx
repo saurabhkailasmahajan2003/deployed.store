@@ -9,6 +9,7 @@ import CategoryPage from './pages/CategoryPage';
 import ProductDetail from './pages/ProductDetail';
 import SpecialCollection from './pages/SpecialCollection';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
 import Wishlist from './pages/Wishlist';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
@@ -38,6 +39,7 @@ function App() {
                   <Route path="/product/:category/:id" element={<ProductDetail />} />
                   <Route path="/product/:id" element={<ProductDetail />} />
                   <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
                   <Route path="/wishlist" element={<Wishlist />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<SignUp />} />

@@ -13,6 +13,7 @@ import accessoryRoutes from './routes/product/accessory.routes.js';
 import menRoutes from './routes/product/men.routes.js';
 import womenRoutes from './routes/product/women.routes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 dotenv.config();
 
@@ -46,6 +47,8 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/payment', paymentRoutes);
+console.log('✅ Payment routes registered at /api/payment');
 
 // Health check
 app.get('/api/health', (req, res) => {

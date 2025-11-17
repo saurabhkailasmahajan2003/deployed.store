@@ -119,6 +119,27 @@ export const orderAPI = {
   },
 };
 
+// Payment API calls
+export const paymentAPI = {
+  createRazorpayOrder: async (shippingAddress) => {
+    return apiRequest('/payment/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ shippingAddress }),
+    });
+  },
+
+  verifyPayment: async (razorpay_order_id, razorpay_payment_id, razorpay_signature) => {
+    return apiRequest('/payment/verify-payment', {
+      method: 'POST',
+      body: JSON.stringify({
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+      }),
+    });
+  },
+};
+
 // Profile API calls
 export const profileAPI = {
   getProfile: async () => {

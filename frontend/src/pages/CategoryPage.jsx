@@ -276,7 +276,7 @@ const CategoryPage = () => {
                 <>
                   <li>
                     <Link 
-                      to={`/${derivedGender}`} 
+                      to={`/${derivedGender}`}
                       className="text-blue-600 hover:text-blue-800 capitalize"
                     >
                       {derivedGender}
@@ -331,6 +331,27 @@ const CategoryPage = () => {
                 </button>
               </div>
             )}
+
+            {/* Mobile subcategory chips */}
+            {derivedGender && (
+              <div className="lg:hidden mb-4 space-y-2">
+                <p className="text-xs uppercase tracking-wide text-gray-500">Subcategories</p>
+                <div className="flex flex-wrap gap-2">
+                  {['shirt', 'tshirt', 'jeans', 'trousers', 'accessories'].map((sub) => (
+                    <Link
+                      key={sub}
+                      to={`/${derivedGender}/${sub}`}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                        derivedCategory === sub ? 'bg-gray-900 text-white' : 'text-gray-600'
+                      }`}
+                      onClick={() => setShowMobileFilters(false)}
+                    >
+                      {sub === 'tshirt' ? 'T-Shirt' : sub.charAt(0).toUpperCase() + sub.slice(1)}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
             <FilterSidebar
               filters={filters}
               onFilterChange={(newFilters) => {
@@ -364,7 +385,7 @@ const CategoryPage = () => {
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {products.map((product) => (
                     <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
                   ))}
