@@ -16,6 +16,19 @@ const Home = () => {
   const [newArrivals, setNewArrivals] = useState([]);
   const [saleItems, setSaleItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeStoryIndex, setActiveStoryIndex] = useState(null);
+  const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
+
+  // Stories data
+  const stories = [
+    { type: 'video', video: 'https://www.pexels.com/download/video/3205919/', hashtag: '#xmas', emoji: '🎄' },
+    { type: 'video', video: 'https://www.pexels.com/download/video/8750557/', hashtag: '#indianfashion', emoji: '😎' },
+    { type: 'video', video: 'https://www.pexels.com/download/video/8346468/', hashtag: '#street', emoji: '🤏' },
+    { type: 'video', video: 'https://www.pexels.com/download/video/34733109/', hashtag: '#fitcheck', emoji: '✨' },
+    { type: 'video', video: 'https://www.pexels.com/download/video/34708744/', hashtag: '#tshirt', emoji: '😌' },
+    { type: 'video', video: 'https://www.pexels.com/download/video/31732953/', hashtag: '#jeans', emoji: '😌' },
+    { type: 'video', video: 'https://www.pexels.com/download/video/9346293/', hashtag: '#fashion', emoji: '😌' },
+  ];
 
   // Carousel slides data
   const carouselSlides = [
@@ -175,6 +188,62 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Stories Section - Hashtag Carousel - Above Hero Section */}
+      <div className="bg-[#FAF9F6] py-2 sm:py-6 lg:py-1 border-b border-gray-200 mt-0 mb-4 sm:mt-0 sm:mb-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center gap-8 sm:gap-12 overflow-x-auto scrollbar-hide pb-2">
+            {stories.map((item, index) => (
+              <div 
+                key={index} 
+                className="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer"
+                onClick={() => {
+                  setActiveStoryIndex(index);
+                  setIsStoryViewerOpen(true);
+                }}
+              >
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-visible p-0.5" style={{ background: 'linear-gradient(45deg, #fbbf24, #ef4444)' }}>
+                  <div className="w-full h-full rounded-full overflow-hidden bg-white p-0.5">
+                    <div className="w-full h-full rounded-full overflow-hidden">
+                      {item.type === 'video' ? (
+                        <video
+                          src={item.video}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error('Video load error:', item.hashtag);
+                            e.target.style.display = 'none';
+                            const fallback = document.createElement('div');
+                            fallback.className = 'w-full h-full bg-gray-300 flex items-center justify-center text-xl';
+                            fallback.textContent = '🎬';
+                            e.target.parentElement.appendChild(fallback);
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src={item.image}
+                          alt={item.hashtag}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/200';
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                  <span>{item.hashtag}</span>
+                  <span>{item.emoji}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section - Carousel */}
       <div className="relative overflow-hidden w-full">
         <div className="relative h-[300px] w-full max-w-[1980px] mx-auto">
@@ -237,6 +306,113 @@ const Home = () => {
           ))}
         </div>
       </div>
+
+      {/* Story Viewer Modal - Instagram Style */}
+      {isStoryViewerOpen && activeStoryIndex !== null && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
+          onClick={() => setIsStoryViewerOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setIsStoryViewerOpen(false);
+            if (e.key === 'ArrowLeft' && activeStoryIndex > 0) setActiveStoryIndex(activeStoryIndex - 1);
+            if (e.key === 'ArrowRight' && activeStoryIndex < stories.length - 1) setActiveStoryIndex(activeStoryIndex + 1);
+          }}
+          tabIndex={0}
+        >
+          {/* Close Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsStoryViewerOpen(false);
+            }}
+            className="absolute top-4 right-4 z-10 text-white hover:text-gray-300 transition"
+            aria-label="Close"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Previous Button */}
+          {activeStoryIndex > 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveStoryIndex(activeStoryIndex - 1);
+              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300 transition"
+              aria-label="Previous story"
+            >
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Next Button */}
+          {activeStoryIndex < stories.length - 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveStoryIndex(activeStoryIndex + 1);
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300 transition"
+              aria-label="Next story"
+            >
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Story Content */}
+          <div 
+            className="relative w-full h-full max-w-md mx-auto flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {stories[activeStoryIndex].type === 'video' ? (
+              <video
+                key={activeStoryIndex}
+                src={stories[activeStoryIndex].video}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  console.error('Video load error:', stories[activeStoryIndex].hashtag);
+                }}
+              />
+            ) : (
+              <img
+                src={stories[activeStoryIndex].image}
+                alt={stories[activeStoryIndex].hashtag}
+                className="w-full h-full object-contain"
+              />
+            )}
+            
+            {/* Hashtag Display */}
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-white text-center">
+              <div className="flex items-center gap-2 text-xl font-semibold">
+                <span>{stories[activeStoryIndex].hashtag}</span>
+                <span>{stories[activeStoryIndex].emoji}</span>
+              </div>
+            </div>
+
+            {/* Story Indicators */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+              {stories.map((_, index) => (
+                <div
+                  key={index}
+                  className={`h-1 rounded-full transition-all ${
+                    index === activeStoryIndex ? 'bg-white w-8' : 'bg-white bg-opacity-50 w-1'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Featured Products */}
       {featuredProducts.length > 0 && (
