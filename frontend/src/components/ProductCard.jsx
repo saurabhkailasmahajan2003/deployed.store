@@ -1,5 +1,4 @@
-// components/ProductCard.jsx
-import { useState, useEffect } from 'react';
+import { useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -16,8 +15,6 @@ const ProductCard = ({ product }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [showSizes, setShowSizes] = useState(false);
-  
-  // NEW: State for image blur effect
   const [imageLoaded, setImageLoaded] = useState(false);
 
   // Data Normalization
@@ -26,6 +23,7 @@ const ProductCard = ({ product }) => {
   const finalPrice = product.finalPrice || product.price;
   const originalPrice = product.originalPrice || product.mrp || product.price;
   const hasDiscount = originalPrice > finalPrice;
+  const productId = product._id || product.id;
 
   const handleAddClick = (e) => {
     e.preventDefault();
@@ -58,8 +56,7 @@ const ProductCard = ({ product }) => {
     e.stopPropagation();
     if (!isAuthenticated) return setShowLoginModal(true);
     
-    const id = product._id || product.id;
-    isInWishlist(id) ? await removeFromWishlist(id) : await addToWishlist(product);
+    isInWishlist(productId) ? await removeFromWishlist(productId) : await addToWishlist(product);
   };
 
   return (
@@ -67,7 +64,8 @@ const ProductCard = ({ product }) => {
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
       
       <div 
-        className="group relative w-full select-none animate-fadeIn" // Added animate-fadeIn
+        // OPTIMIZATION: translate-z-0 forces hardware acceleration
+        className="group relative w-full select-none transform-gpu translate-z-0" 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {
           setIsHovered(false);
@@ -76,7 +74,7 @@ const ProductCard = ({ product }) => {
           }
         }}
       >
-        <Link to={`/product/${product._id || product.id}`} className="block">
+        <Link to={`/product/${productId}`} className="block">
           
           {/* IMAGE AREA */}
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-gray-100 shadow-sm">
@@ -87,7 +85,7 @@ const ProductCard = ({ product }) => {
               className="absolute top-2 right-2 z-20 p-2 rounded-full bg-white/60 backdrop-blur-md hover:bg-white text-gray-800 transition-all duration-300 active:scale-90"
             >
               <svg 
-                className={`w-5 h-5 ${isInWishlist(product._id || product.id) ? 'fill-red-500 text-red-500' : 'fill-none'}`}
+                className={`w-5 h-5 ${isInWishlist(productId) ? 'fill-red-500 text-red-500' : 'fill-none'}`}
                 stroke="currentColor" 
                 viewBox="0 0 24 24" 
                 strokeWidth="1.5"
@@ -103,17 +101,19 @@ const ProductCard = ({ product }) => {
                </span>
             )}
 
-            {/* Main Image with Blur-Up Effect */}
+            {/* Main Image */}
             <img
               src={isHovered && productImages.length > 1 ? productImages[1] : productImages[0]}
               alt={product.name}
               onLoad={() => setImageLoaded(true)}
+              // OPTIMIZATION: decoding="async" prevents main thread blocking
+              decoding="async"
+              loading="lazy"
               className={`
-                absolute inset-0 w-full h-full object-cover transition-all duration-700 md:group-hover:scale-105
-                ${imageLoaded ? 'blur-0 scale-100 opacity-100' : 'blur-lg scale-110 opacity-0'}
+                absolute inset-0 w-full h-full object-cover transition-all duration-500 md:group-hover:scale-105
+                ${imageLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-sm'}
               `}
               onError={handleImageError}
-              loading="lazy"
             />
 
             {/* --- THE FLOATING DOCK --- */}
@@ -146,7 +146,7 @@ const ProductCard = ({ product }) => {
                     </button>
                   </>
                 ) : (
-                  <div className="relative px-2 text-center animate-fadeIn w-full">
+                  <div className="relative px-2 text-center w-full animate-fadeIn">
                     <div className="flex items-center justify-between mb-2 px-1">
                       <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Select Size</span>
                       <button 
@@ -183,7 +183,6 @@ const ProductCard = ({ product }) => {
                         </button>
                       ))}
                     </div>
-                    {isAdding && <p className="text-[10px] text-green-600 font-medium mt-1.5">Adding to bag...</p>}
                   </div>
                 )}
               </div>
@@ -214,4 +213,9 @@ const ProductCard = ({ product }) => {
   );
 };
 
-export default ProductCard;
+// PERFORMANCE FIX: 
+// Only re-render if the product ID changes. 
+// This prevents the "stutter" when infinite scroll adds new items.
+export default memo(ProductCard, (prev, next) => {
+  return (prev.product._id || prev.product.id) === (next.product._id || next.product.id);
+});
