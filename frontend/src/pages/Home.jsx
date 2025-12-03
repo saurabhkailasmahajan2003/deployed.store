@@ -20,11 +20,11 @@ const Home = () => {
 
   // Stories data (Preserved)
   const stories = [
-    { hashtag: '#xmas', emoji: '🎄', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764741928/IMG_20251123_161820_skzchs.png', link:'' },
+    { hashtag: '#xmas', emoji: '🎄', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764741928/IMG_20251123_161820_skzchs.png', link: '' },
     { hashtag: '#indianfashion', emoji: '😎', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764741995/image-104_iuyyuw.png' },
     { hashtag: '#street', emoji: '🤏', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742092/ZfLAMkmNsf2sHkoW_DELHI-FACES-1_fjnvcb.avif' },
     { hashtag: '#fitcheck', emoji: '✨', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742199/0d37737c8c2c7536422e411fb68eeeb3_ylhf3n.jpg' },
-    { hashtag: '#tshirt', emoji: '😌', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742259/0424-TSHIRT-06_1_7c30d8ed-155d-47a6-a52f-52858221a302_fjdfpo.webp', link:'/mens'},
+    { hashtag: '#tshirt', emoji: '😌', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742259/0424-TSHIRT-06_1_7c30d8ed-155d-47a6-a52f-52858221a302_fjdfpo.webp', link: '/mens' },
     { hashtag: '#jeans', emoji: '😌', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742467/GettyImages-2175843730_q21gse.jpg' },
     { hashtag: '#fashion', emoji: '😌', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742548/NECK_20SCARF_20TREND_20190625_20GettyImages-1490484490_ccdwdy.webp' }
   ];
@@ -67,7 +67,7 @@ const Home = () => {
       if (accessoriesRes.success) setAccessories(accessoriesRes.data.products || []);
       if (menRes.success) setMenItems(menRes.data.products || []);
       if (womenRes.success) setWomenItems(womenRes.data.products || []);
-      
+
       if (newArrivalRes.success) {
         const arrivals = (newArrivalRes.data.products || []).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
         setNewArrivals(arrivals.slice(0, 8));
@@ -112,7 +112,7 @@ const Home = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-500 text-sm uppercase tracking-widest">Loading collection...</p>
+          <p className="mt-4 text-gray-500 text-sm uppercase tracking-widest">Loading...</p>
         </div>
       </div>
     );
@@ -122,58 +122,89 @@ const Home = () => {
     <div className="min-h-screen bg-white font-sans text-gray-900">
 
       {/* --- HERO CAROUSEL (Clean - No Overlays, Original Ratio) --- */}
+
+
+
+
+
+      {/* --- HERO SECTION --- */}
       <div className="relative w-full bg-gray-50 overflow-hidden group">
-        {/* Container to maintain aspect ratio and center the banner */}
-        <div className="relative w-full max-w-[2000px] mx-auto aspect-[21/9] md:aspect-[3/1]">
-          {carouselSlides.map((slide, index) => (
-            <Link
-              to={slide.link}
-              key={index}
-              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-            >
-              {/* object-contain ensures the whole image is seen in original ratio */}
-              <img
-                src={slide.image}
-                alt="Banner"
-                className="w-full h-full object-contain object-center"
-                onError={(e) => handleImageError(e, 1920, 600)}
+
+        {/* 1. DESKTOP CAROUSEL (Visible only on Large screens) */}
+        <div className="hidden lg:block relative w-full">
+
+          {/* Aspect Ratio Container */}
+          <div className="relative w-full max-w-[2000px] mx-auto aspect-[21/9] md:aspect-[3/1]">
+            {carouselSlides.map((slide, index) => (
+              <Link
+                to={slide.link}
+                key={index}
+                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+              >
+                <img
+                  src={slide.image}
+                  alt="Banner"
+                  className="w-full h-full object-contain object-center"
+                  onError={(e) => handleImageError(e, 1920, 600)}
+                />
+              </Link>
+            ))}
+          </div>
+
+          {/* Navigation Arrows (Desktop Only) */}
+          <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 text-gray-800 hover:bg-white transition shadow-sm opacity-0 group-hover:opacity-100">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 text-gray-800 hover:bg-white transition shadow-sm opacity-0 group-hover:opacity-100">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          </button>
+
+          {/* Indicators (Desktop Only) */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+            {carouselSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`h-1 rounded-full transition-all duration-300 ${index === currentSlide ? 'w-8 bg-gray-800' : 'w-2 bg-gray-300 hover:bg-gray-500'}`}
               />
-            </Link>
-          ))}
+            ))}
+          </div>
         </div>
 
-        {/* Navigation Arrows (Subtle) */}
-        <button onClick={prevSlide} className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 text-gray-800 hover:bg-white transition shadow-sm opacity-0 group-hover:opacity-100">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-        </button>
-        <button onClick={nextSlide} className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 text-gray-800 hover:bg-white transition shadow-sm opacity-0 group-hover:opacity-100">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-        </button>
-
-        {/* Indicators (Subtle) */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-          {carouselSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`h-1 rounded-full transition-all duration-300 ${index === currentSlide ? 'w-8 bg-gray-800' : 'w-2 bg-gray-300 hover:bg-gray-500'}`}
+        {/* 2. MOBILE BANNER (Visible only on Mobile/Tablet) */}
+        {/* h-auto ensures the height adjusts to width, keeping original ratio */}
+        <div className="block lg:hidden w-full">
+          <Link to="/sale"> {/* Optional: Link to a page */}
+            <img
+              src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1764765679/Gemini_Generated_Image_cspotecspotecspo_mw6a6n.png"
+              alt="Mobile Banner"
+              className="w-full h-auto object-contain block"
             />
-          ))}
+          </Link>
         </div>
+
       </div>
+
+
+
+
 
       {/* --- STORIES SECTION --- */}
       <div className="py-10 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-6">Trending Now</h3>
-          <div className="flex justify-center gap-8 overflow-x-auto scrollbar-hide pb-4 px-4">
+          <h3 className="text-xl sm:text-xs font-bold uppercase tracking-widest text-gray-900 mb-6">Stories By Urban Vastra</h3>
+          {/* Use justify-start to allow scrolling without cutoff on mobile, justify-center on desktop */}
+          <div className="flex justify-start md:justify-center gap-5 md:gap-8 overflow-x-auto scrollbar-hide pb-4 px-4">
             {stories.map((item, index) => (
               <div
                 key={index}
-                className="flex-shrink-0 flex flex-col items-center gap-3 cursor-pointer group"
-                onClick={() => { setActiveStoryIndex(index); setIsStoryViewerOpen(true); }}
+                className="flex-shrink-0 flex flex-col items-center gap-3 cursor-pointer"
+                onClick={() => { 
+                  if (setActiveStoryIndex) setActiveStoryIndex(index); 
+                  if (setIsStoryViewerOpen) setIsStoryViewerOpen(true); 
+                }}
               >
-                <div className="relative p-1 rounded-full border-2 border-rose-500 group-hover:scale-105 transition-transform duration-300">
+                <div className="relative p-1 rounded-full border-2 border-rose-500">
                   <div className="p-0.5 bg-white rounded-full">
                     <img
                       src={item.image}
@@ -191,37 +222,27 @@ const Home = () => {
       </div>
 
       {/* --- FEATURED COLLECTIONS (Shirts) --- */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-           <h2 className="text-3xl font-bold text-gray-900 uppercase tracking-tight">The Shirt Edit</h2>
-           <p className="text-gray-500 mt-2">Essential styles for him and her.</p>
+          <h2 className="text-3xl font-bold text-gray-900 uppercase tracking-tight">The Shirt Edit</h2>
+          <p className="text-gray-500 mt-2">Essential styles for him and her.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Link to="/women/shirt" className="group relative h-[450px] overflow-hidden rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+          <Link to="/women/shirt" className="block w-full">
             <img
               src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1763492921/Black_and_White_Modern_New_Arrivals_Blog_Banner_4_x9v1lw.png"
               alt="Women's Shirts"
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              className="w-full h-auto block"
             />
-            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-            <div className="absolute bottom-8 left-8 text-white text-left">
-              <h3 className="text-2xl font-bold uppercase tracking-wide mb-2">Women's</h3>
-              <span className="inline-block bg-white text-black text-xs font-bold px-4 py-2 uppercase tracking-widest">Shop Now</span>
-            </div>
           </Link>
 
-          <Link to="/men/shirt" className="group relative h-[450px] overflow-hidden rounded-lg">
+          <Link to="/men/shirt" className="block w-full">
             <img
               src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1763493394/5ad7474b-2e60-47c5-b993-cdc9c1449c08.png"
               alt="Men's Shirts"
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              className="w-full h-auto block"
             />
-            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-            <div className="absolute bottom-8 left-8 text-white text-left">
-              <h3 className="text-2xl font-bold uppercase tracking-wide mb-2">Men's</h3>
-              <span className="inline-block bg-white text-black text-xs font-bold px-4 py-2 uppercase tracking-widest">Shop Now</span>
-            </div>
           </Link>
         </div>
       </div>
@@ -248,8 +269,8 @@ const Home = () => {
         <section className="bg-rose-50 py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-                 <h2 className="text-3xl font-black text-rose-600 uppercase tracking-tight">Sale Highlights</h2>
-                 <p className="text-rose-900/70 mt-2 font-medium">Don't miss out on limited-time offers.</p>
+              <h2 className="text-3xl font-black text-rose-600 uppercase tracking-tight">Sale Highlights</h2>
+              <p className="text-rose-900/70 mt-2 font-medium">Don't miss out on limited-time offers.</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
               {saleItems.map((product) => (
@@ -267,37 +288,37 @@ const Home = () => {
 
       {/* --- MEN & WOMEN GRIDS --- */}
       <section className="py-20 bg-white">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
-            {/* Men */}
-            {menItems.length > 0 && (
-               <div>
-                  <div className="flex items-center justify-between mb-10">
-                  <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-tight">Men's Collection</h2>
-                  <Link to="/men" className="text-sm font-bold uppercase tracking-wider border-b-2 border-transparent hover:border-gray-900 transition-all">View All</Link>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
-                  {menItems.map((product) => (
-                     <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
-                  ))}
-                  </div>
-               </div>
-            )}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
+          {/* Men */}
+          {menItems.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-10">
+                <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-tight">Men's Collection</h2>
+                <Link to="/men" className="text-sm font-bold uppercase tracking-wider border-b-2 border-transparent hover:border-gray-900 transition-all">View All</Link>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
+                {menItems.map((product) => (
+                  <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
+                ))}
+              </div>
+            </div>
+          )}
 
-            {/* Women */}
-            {womenItems.length > 0 && (
-               <div>
-                  <div className="flex items-center justify-between mb-10">
-                  <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-tight">Women's Collection</h2>
-                  <Link to="/women" className="text-sm font-bold uppercase tracking-wider border-b-2 border-transparent hover:border-gray-900 transition-all">View All</Link>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
-                  {womenItems.map((product) => (
-                     <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
-                  ))}
-                  </div>
-               </div>
-            )}
-         </div>
+          {/* Women */}
+          {womenItems.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-10">
+                <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-tight">Women's Collection</h2>
+                <Link to="/women" className="text-sm font-bold uppercase tracking-wider border-b-2 border-transparent hover:border-gray-900 transition-all">View All</Link>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
+                {womenItems.map((product) => (
+                  <ProductCard key={product._id || product.id} product={normalizeProduct(product)} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* --- ACCESSORIES & WATCHES SPLIT --- */}
@@ -317,10 +338,10 @@ const Home = () => {
               </div>
             </div>
           )}
-          
+
           {/* Lenses/Accessories Mixed */}
           {(lenses.length > 0 || accessories.length > 0) && (
-             <div>
+            <div>
               <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
                 <h2 className="text-xl font-bold text-gray-900 uppercase tracking-wide">Essentials & Eyewear</h2>
                 <Link to="/accessories" className="text-xs font-bold uppercase text-gray-600 hover:text-black">Shop All</Link>
@@ -342,17 +363,17 @@ const Home = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             {['men', 'women', 'watches', 'lenses'].map((cat) => (
-               <Link key={cat} to={`/${cat}`} className="group relative h-40 bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center hover:bg-gray-100 transition-all">
-                  <div className="text-center z-10">
-                     <span className="block text-2xl mb-2 grayscale group-hover:grayscale-0 transition-all">
-                        {cat === 'men' && '👔'}
-                        {cat === 'women' && '👗'}
-                        {cat === 'watches' && '⌚'}
-                        {cat === 'lenses' && '👓'}
-                     </span>
-                     <h3 className="text-lg font-bold uppercase tracking-wider">{cat}</h3>
-                  </div>
-               </Link>
+              <Link key={cat} to={`/${cat}`} className="group relative h-40 bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center hover:bg-gray-100 transition-all">
+                <div className="text-center z-10">
+                  <span className="block text-2xl mb-2 grayscale group-hover:grayscale-0 transition-all">
+                    {cat === 'men' && '👔'}
+                    {cat === 'women' && '👗'}
+                    {cat === 'watches' && '⌚'}
+                    {cat === 'lenses' && '👓'}
+                  </span>
+                  <h3 className="text-lg font-bold uppercase tracking-wider">{cat}</h3>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
