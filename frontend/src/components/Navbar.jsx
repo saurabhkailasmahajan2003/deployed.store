@@ -10,724 +10,377 @@ const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState('men');
+  
+  const [activeCategory, setActiveCategory] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showMenDropdown, setShowMenDropdown] = useState(false);
-  const [showWomenDropdown, setShowWomenDropdown] = useState(false);
-  const [showWatchesDropdown, setShowWatchesDropdown] = useState(false);
-  const [showLensesDropdown, setShowLensesDropdown] = useState(false);
-  const [showAccessoriesDropdown, setShowAccessoriesDropdown] = useState(false);
+  
+  // UI States
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [expandedMobileCategory, setExpandedMobileCategory] = useState(null); // Mobile Accordion
+  const [hoveredCategory, setHoveredCategory] = useState(null); // Desktop Dropdown
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Update active category based on current route
-  useEffect(() => {
-    if (location.pathname === '/') {
-      setActiveCategory('home');
-    } else if (location.pathname.startsWith('/women')) {
-      setActiveCategory('women');
-    } else if (location.pathname.startsWith('/men')) {
-      setActiveCategory('men');
-    } else if (location.pathname.startsWith('/watches')) {
-      setActiveCategory('watches');
-    } else if (location.pathname.startsWith('/lenses')) {
-      setActiveCategory('lenses');
-    } else if (location.pathname.startsWith('/accessories')) {
-      setActiveCategory('accessories');
-    }
-  }, [location.pathname]);
-
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const menCategories = [
-    { name: 'Shirt', path: '/men/shirt' },
-    { name: 'T-Shirt', path: '/men/tshirt' },
+  // --- DATA CONFIGURATION ---
+  
+  // 1. Define Sub-Items for each category
+  const menSubItems = [
+    { name: 'Shirts', path: '/men/shirt' },
+    { name: 'T-Shirts', path: '/men/tshirt' },
     { name: 'Jeans', path: '/men/jeans' },
     { name: 'Trousers', path: '/men/trousers' },
   ];
 
-  const womenCategories = [
-    { name: 'Shirt', path: '/women/shirt' },
-    { name: 'T-Shirt', path: '/women/tshirt' },
+  const womenSubItems = [
+    { name: 'Shirts', path: '/women/shirt' },
+    { name: 'T-Shirts', path: '/women/tshirt' },
     { name: 'Jeans', path: '/women/jeans' },
     { name: 'Trousers', path: '/women/trousers' },
   ];
 
-  const genderOptions = [
-    { name: 'Men', path: 'men' },
-    { name: 'Women', path: 'women' },
+  const watchesSubItems = [
+    { name: "Men's Watches", path: '/watches?gender=men' },
+    { name: "Women's Watches", path: '/watches?gender=women' },
+    { name: 'Smart Watches', path: '/watches?type=smart' },
   ];
+
+  const lensesSubItems = [
+    { name: "Men's Eyewear", path: '/lenses?gender=men' },
+    { name: "Women's Eyewear", path: '/lenses?gender=women' },
+    { name: 'Sunglasses', path: '/lenses?type=sun' },
+  ];
+
+  const accessoriesSubItems = [
+    { name: "Men's Accessories", path: '/accessories?gender=men' },
+    { name: "Women's Accessories", path: '/accessories?gender=women' },
+    { name: 'Wallets & Belts', path: '/accessories?type=general' },
+  ];
+
+  // 2. Master Navigation Config
+  const navLinks = [
+    { id: 'men', label: 'Men', path: '/men', subItems: menSubItems },
+    { id: 'women', label: 'Women', path: '/women', subItems: womenSubItems },
+    { id: 'watches', label: 'Watches', path: '/watches', subItems: watchesSubItems },
+    { id: 'lenses', label: 'Lenses', path: '/lenses', subItems: lensesSubItems },
+    { id: 'accessories', label: 'Accessories', path: '/accessories', subItems: accessoriesSubItems },
+  ];
+
+  // --- EFFECTS ---
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/') setActiveCategory('home');
+    else if (path.includes('/men')) setActiveCategory('men');
+    else if (path.includes('/women')) setActiveCategory('women');
+    else if (path.includes('/watches')) setActiveCategory('watches');
+    else if (path.includes('/lenses')) setActiveCategory('lenses');
+    else if (path.includes('/accessories')) setActiveCategory('accessories');
+    else if (path.includes('/sale')) setActiveCategory('sale');
+    
+    setIsMobileMenuOpen(false);
+    setIsSearchOpen(false);
+    window.scrollTo(0, 0); // Scroll to top on route change
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'unset';
+  }, [isMobileMenuOpen]);
+
+  // --- HANDLERS ---
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
       setSearchQuery('');
+      setIsSearchOpen(false);
     }
+  };
+
+  const toggleMobileAccordion = (id) => {
+    setExpandedMobileCategory(expandedMobileCategory === id ? null : id);
   };
 
   return (
     <>
-      {/* Main Navbar */}
-      <nav className={`bg-white shadow-sm sticky top-0 z-50 transition-all duration-300 `}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 gap-4">
-            {/* Logo */}
-            <Link 
-              to="/" 
-              className="flex items-center space-x-2 flex-shrink-0 group"
-            >
-              <img 
-                src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1764747760/Urban_Vesra-removebg-preview_xyipwy.png"
-                alt="Astra Logo"
-                className="h-12 w-auto object-contain"
-              />
-            </Link>
-            {/* Search Bar - Desktop */}
-            <form 
-              onSubmit={handleSearch} 
-              className="hidden md:flex flex-1 max-w-md mx-4"
-            >
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full px-3 py-1.5 pl-9 pr-9 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                />
-                <svg
-                  className="absolute left-2.5 top-2 h-4 w-4 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1.5 text-blue-600 hover:text-blue-700 transition-colors"
-                  title="Search"
-                >
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </form>
+      {/* =======================
+          HEADER
+      ======================== */}
+      <nav 
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b 
+        ${isScrolled ? 'bg-white/95 backdrop-blur-md border-gray-200 shadow-sm py-2' : 'bg-white border-transparent py-3 md:py-4'}`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-12">
 
-            {/* Right Side Actions - Desktop */}
-            <div className="hidden md:flex items-center space-x-2 flex-shrink-0">
-              {/* Sign In / User Menu */}
-              {!isAuthenticated ? (
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors"
-                >
-                  Sign In
-                </Link>
-              ) : (
-                <div className="relative group">
-                  <div className="flex items-center space-x-2 px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md transition-colors">
-                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                      {user?.name?.charAt(0).toUpperCase() || 'U'}
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">{user?.name || 'User'}</span>
-                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <div className="px-4 py-2 border-b border-gray-200">
-                      <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
-                    </div>
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      My Profile
-                    </Link>
-                    <button
-                      onClick={() => {
-                        logout();
-                        navigate('/');
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Wishlist */}
-              <Link
-                to="/wishlist"
-                className="relative flex items-center justify-center p-2 text-gray-700 hover:text-blue-600 transition-colors group"
-                title="Wishlist"
+            {/* LEFT: Mobile Toggle & Logo */}
+            <div className="flex items-center gap-4">
+              <button 
+                className="md:hidden p-1 text-gray-800"
+                onClick={() => setIsMobileMenuOpen(true)}
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  />
-                </svg>
-                {getWishlistCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-md">
-                    {getWishlistCount() > 9 ? '9+' : getWishlistCount()}
-                  </span>
-                )}
-              </Link>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h7" /></svg>
+              </button>
 
-              {/* Cart */}
-              <Link
-                to="/cart"
-                className="relative flex items-center justify-center p-2 text-gray-700 hover:text-blue-600 transition-colors group"
-                title="Cart"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                {getCartItemsCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-md">
-                    {getCartItemsCount() > 9 ? '9+' : getCartItemsCount()}
-                  </span>
-                )}
+              <Link to="/" className="flex-shrink-0 group">
+                 <img 
+                   src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1764747760/Urban_Vesra-removebg-preview_xyipwy.png"
+                   alt="Logo"
+                   className="h-8 md:h-11 w-auto object-contain transition-transform group-hover:scale-105"
+                 />
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-gray-700 hover:text-blue-600 transition-colors"
-              aria-label="Toggle menu"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {/* CENTER: Desktop Navigation (Dynamic) */}
+            <div className="hidden md:flex items-center space-x-8">
+              <Link 
+                to="/" 
+                className={`text-sm font-medium uppercase tracking-wide transition-colors ${activeCategory === 'home' ? 'text-black font-bold' : 'text-gray-500 hover:text-black'}`}
               >
-                {isMobileMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
+                Home
+              </Link>
+
+              {navLinks.map((link) => (
+                 <div 
+                  key={link.id} 
+                  className="relative group h-12 flex items-center"
+                  onMouseEnter={() => setHoveredCategory(link.id)}
+                  onMouseLeave={() => setHoveredCategory(null)}
+                 >
+                    <Link 
+                      to={link.path}
+                      className={`text-sm font-medium transition-colors tracking-wide uppercase ${activeCategory === link.id ? 'text-black font-bold' : 'text-gray-500 hover:text-black'}`}
+                    >
+                      {link.label}
+                    </Link>
+                    
+                    {/* Active Indicator */}
+                    {activeCategory === link.id && (
+                      <span className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-black rounded-full"></span>
+                    )}
+
+                    {/* Desktop Dropdown */}
+                    {hoveredCategory === link.id && link.subItems && (
+                       <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2">
+                         <div className="bg-white rounded-lg shadow-xl border border-gray-100 p-2 w-56 animate-fadeIn">
+                            {link.subItems.map((sub, idx) => (
+                              <Link 
+                                key={idx} 
+                                to={sub.path}
+                                className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-black rounded-md transition-colors"
+                              >
+                                {sub.name}
+                              </Link>
+                            ))}
+                            <div className="border-t border-gray-50 mt-1 pt-1">
+                              <Link to={link.path} className="block px-4 py-2 text-xs font-bold text-black uppercase tracking-wider hover:bg-gray-50">
+                                View All {link.label}
+                              </Link>
+                            </div>
+                         </div>
+                       </div>
+                    )}
+                 </div>
+              ))}
+              
+              <Link to="/sale" className="text-sm font-bold text-red-600 uppercase tracking-wide hover:text-red-700">Sale</Link>
+            </div>
+
+            {/* RIGHT: Actions */}
+            <div className="flex items-center gap-2 md:gap-5">
+              
+              {/* Search Toggle (Mobile) */}
+              <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="md:hidden p-2 text-gray-700">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              </button>
+
+              {/* Desktop Search */}
+              <form onSubmit={handleSearch} className="hidden md:block relative group">
+                 <input 
+                   type="text" 
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                   placeholder="Search..."
+                   className="pl-4 pr-10 py-2 text-sm bg-gray-100/80 hover:bg-gray-100 rounded-full border-none focus:ring-1 focus:ring-black w-48 transition-all duration-300 placeholder-gray-500"
+                 />
+                 <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-black">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                 </button>
+              </form>
+
+              {/* Icons */}
+              <div className="hidden md:flex items-center gap-3">
+                 <Link to="/wishlist" className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full relative transition-all">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                    {getWishlistCount() > 0 && <span className="absolute top-1 right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>}
+                 </Link>
+
+                 {isAuthenticated ? (
+                   <Link to="/profile" className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition-all">
+                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                   </Link>
+                 ) : (
+                   <Link to="/login" className="text-sm font-bold text-gray-900 hover:text-gray-600 px-3 py-2">Login</Link>
+                 )}
+                 
+                 <Link to="/cart" className="flex items-center justify-center w-10 h-10 bg-black text-white rounded-full hover:bg-gray-800 transition-all relative">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                    {getCartItemsCount() > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white">
+                        {getCartItemsCount()}
+                      </span>
+                    )}
+                 </Link>
+              </div>
+
+              {/* Mobile Cart Icon */}
+              <Link to="/cart" className="md:hidden p-2 text-gray-800 relative">
+                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                 {getCartItemsCount() > 0 && <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border border-white"></span>}
+              </Link>
+
+            </div>
           </div>
+
+          {/* Mobile Search Expand */}
+          {isSearchOpen && (
+            <form onSubmit={handleSearch} className="md:hidden py-3 px-1 animate-slideDown">
+               <input 
+                 autoFocus
+                 type="text" 
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+                 placeholder="Search products..."
+                 className="w-full bg-gray-100 border-none rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-black"
+               />
+            </form>
+          )}
         </div>
       </nav>
+      
+      {/* Spacer to prevent content from hiding behind fixed navbar */}
+      <div className="h-16 md:h-20 w-full"></div>
 
-      {/* Sub-navbar with Categories - Desktop */}
-      {location.pathname !== '/admin' && (
-      <div className="bg-gray-50 border-b border-gray-200 sticky top-16 z-40 hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center space-x-1 py-2">
-            {/* Home */}
-            <Link
-              to="/"
-              onClick={() => setActiveCategory('home')}
-              className={`px-4 py-2.5 text-sm font-medium transition-colors ${
-                location.pathname === '/'
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
-              }`}
-            >
-              Home
-            </Link>
 
-            {/* Men with Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setShowMenDropdown(true)}
-              onMouseLeave={() => setShowMenDropdown(false)}
-            >
-              <Link
-                to="/men"
-                onClick={() => setActiveCategory('men')}
-                className={`flex items-center gap-1 px-4 py-2.5 text-sm font-medium transition-colors ${
-                  activeCategory === 'men'
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
-                }`}
-              >
-                <span>Men</span>
-                <svg 
-                  className={`w-4 h-4 transition-transform ${showMenDropdown ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </Link>
-              {showMenDropdown && (
-                <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-xl py-2 z-50 transition-all duration-200">
-                  {menCategories.map((cat) => (
-                    <Link
-                      key={cat.path}
-                      to={cat.path}
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                      onClick={() => {
-                        setActiveCategory('men');
-                        setShowMenDropdown(false);
-                      }}
-                    >
-                      {cat.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
+      {/* =======================
+          MOBILE BOTTOM BAR
+      ======================== */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50 flex justify-around items-center py-3 pb-safe-area shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+         <Link to="/" className={`flex flex-col items-center gap-1 w-16 ${activeCategory === 'home' ? 'text-black' : 'text-gray-400'}`}>
+            <svg className="w-6 h-6" fill={activeCategory === 'home' ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+            <span className="text-[10px] font-medium">Home</span>
+         </Link>
+         
+         <button onClick={() => setIsMobileMenuOpen(true)} className={`flex flex-col items-center gap-1 w-16 ${isMobileMenuOpen ? 'text-black' : 'text-gray-400'}`}>
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            <span className="text-[10px] font-medium">Menu</span>
+         </button>
+
+         <Link to="/wishlist" className="flex flex-col items-center gap-1 w-16 text-gray-400">
+            <div className="relative">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+              {getWishlistCount() > 0 && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>}
             </div>
+            <span className="text-[10px] font-medium">Saved</span>
+         </Link>
 
-            {/* Women with Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setShowWomenDropdown(true)}
-              onMouseLeave={() => setShowWomenDropdown(false)}
-            >
-              <Link
-                to="/women"
-                onClick={() => setActiveCategory('women')}
-                className={`flex items-center gap-1 px-4 py-2.5 text-sm font-medium transition-colors ${
-                  activeCategory === 'women'
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
-                }`}
-              >
-                <span>Women</span>
-                <svg 
-                  className={`w-4 h-4 transition-transform ${showWomenDropdown ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </Link>
-              {showWomenDropdown && (
-                <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-xl py-2 z-50 transition-all duration-200">
-                  {womenCategories.map((cat) => (
-                    <Link
-                      key={cat.path}
-                      to={cat.path}
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                      onClick={() => {
-                        setActiveCategory('women');
-                        setShowWomenDropdown(false);
-                      }}
-                    >
-                      {cat.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+         <Link to={isAuthenticated ? "/profile" : "/login"} className="flex flex-col items-center gap-1 w-16 text-gray-400">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+            <span className="text-[10px] font-medium">Account</span>
+         </Link>
+      </div>
 
-            {/* Watches with Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setShowWatchesDropdown(true)}
-              onMouseLeave={() => setShowWatchesDropdown(false)}
-            >
-              <Link
-                to="/watches"
-                onClick={() => setActiveCategory('watches')}
-                className={`flex items-center gap-1 px-4 py-2.5 text-sm font-medium transition-colors ${
-                  activeCategory === 'watches'
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
-                }`}
-              >
-                <span>Watches</span>
-                <svg 
-                  className={`w-4 h-4 transition-transform ${showWatchesDropdown ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </Link>
-              {showWatchesDropdown && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl py-2 z-50 transition-all duration-200">
-                  {genderOptions.map((gender) => (
-                    <Link
-                      key={gender.path}
-                      to={`/watches?gender=${gender.path}`}
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors whitespace-nowrap"
-                      onClick={() => {
-                        setActiveCategory('watches');
-                        setShowWatchesDropdown(false);
-                      }}
-                    >
-                      {gender.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
 
-            {/* Lenses with Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setShowLensesDropdown(true)}
-              onMouseLeave={() => setShowLensesDropdown(false)}
-            >
-              <Link
-                to="/lenses"
-                onClick={() => setActiveCategory('lenses')}
-                className={`flex items-center gap-1 px-4 py-2.5 text-sm font-medium transition-colors ${
-                  activeCategory === 'lenses'
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
-                }`}
-              >
-                <span>Lenses</span>
-                <svg 
-                  className={`w-4 h-4 transition-transform ${showLensesDropdown ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </Link>
-              {showLensesDropdown && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl py-2 z-50 transition-all duration-200">
-                  {genderOptions.map((gender) => (
-                    <Link
-                      key={gender.path}
-                      to={`/lenses?gender=${gender.path}`}
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors whitespace-nowrap"
-                      onClick={() => {
-                        setActiveCategory('lenses');
-                        setShowLensesDropdown(false);
-                      }}
-                    >
-                      {gender.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+      {/* =======================
+          MOBILE SIDE DRAWER
+      ======================== */}
+      <div 
+        className={`fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      ></div>
 
-            {/* Accessories with Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setShowAccessoriesDropdown(true)}
-              onMouseLeave={() => setShowAccessoriesDropdown(false)}
-            >
-              <Link
-                to="/accessories"
-                onClick={() => setActiveCategory('accessories')}
-                className={`flex items-center gap-1 px-4 py-2.5 text-sm font-medium transition-colors ${
-                  activeCategory === 'accessories'
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
-                }`}
-              >
-                <span>Accessories</span>
-                <svg 
-                  className={`w-4 h-4 transition-transform ${showAccessoriesDropdown ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </Link>
-              {showAccessoriesDropdown && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl py-2 z-50 transition-all duration-200">
-                  {genderOptions.map((gender) => (
-                    <Link
-                      key={gender.path}
-                      to={`/accessories?gender=${gender.path}`}
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors whitespace-nowrap"
-                      onClick={() => {
-                        setActiveCategory('accessories');
-                        setShowAccessoriesDropdown(false);
-                      }}
-                    >
-                      {gender.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+      <div 
+        className={`fixed inset-y-0 left-0 z-[61] w-[85%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col md:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        
+        {/* Drawer Header */}
+        <div className="p-6 bg-gray-50 border-b border-gray-100">
+           <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold tracking-tight">Menu</h2>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-white rounded-full text-gray-500 hover:text-black shadow-sm">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+           </div>
+           
+           {isAuthenticated ? (
+             <div className="flex items-center gap-3">
+               <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center text-sm font-bold shadow-md">
+                 {user?.name?.charAt(0).toUpperCase()}
+               </div>
+               <div className="flex-1 min-w-0">
+                 <p className="font-bold text-gray-900 truncate">Hi, {user?.name}</p>
+                 <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="text-xs text-red-600 font-semibold uppercase mt-0.5">Sign Out</button>
+               </div>
+             </div>
+           ) : (
+             <div className="flex gap-3">
+               <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 py-2.5 text-center text-sm font-bold bg-black text-white rounded-lg shadow-md">Login</Link>
+               <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 py-2.5 text-center text-sm font-bold bg-white border border-gray-200 text-gray-900 rounded-lg">Register</Link>
+             </div>
+           )}
+        </div>
 
-            {/* New Arrival */}
-            <Link
-              to="/new-arrival"
-              className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition-colors"
-            >
-              New Arrival
-            </Link>
+        {/* Drawer Links */}
+        <div className="flex-1 overflow-y-auto pb-8">
+          
+          <div className="py-2">
+             <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="block px-6 py-3.5 text-base font-semibold text-gray-800 hover:bg-gray-50 border-l-4 border-transparent hover:border-black transition-all">Home</Link>
+             <Link to="/new-arrival" onClick={() => setIsMobileMenuOpen(false)} className="block px-6 py-3.5 text-base font-semibold text-gray-800 hover:bg-gray-50 border-l-4 border-transparent hover:border-black transition-all">New Arrivals</Link>
+             <Link to="/sale" onClick={() => setIsMobileMenuOpen(false)} className="block px-6 py-3.5 text-base font-bold text-red-600 hover:bg-red-50 border-l-4 border-transparent hover:border-red-600 transition-all">Sale</Link>
+          </div>
 
-            {/* Sale */}
-            <Link
-              to="/sale"
-              className="px-4 py-2.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors font-semibold"
-            >
-              Sale
-            </Link>
+          <div className="h-px bg-gray-100 mx-6 my-2"></div>
 
-            {/* Shop */}
-            <Link
-              to="/shop"
-              className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition-colors"
-            >
-              Shop
-            </Link>
+          <div className="py-2">
+            <p className="px-6 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Categories</p>
+
+            {/* DYNAMIC ACCORDIONS FOR ALL CATEGORIES */}
+            {navLinks.map((link) => (
+              <div key={link.id}>
+                 <button 
+                   onClick={() => toggleMobileAccordion(link.id)}
+                   className={`w-full flex items-center justify-between px-6 py-3.5 text-base font-medium transition-colors ${expandedMobileCategory === link.id ? 'text-black bg-gray-50' : 'text-gray-700 hover:bg-gray-50'}`}
+                 >
+                   <span>{link.label}</span>
+                   <svg className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${expandedMobileCategory === link.id ? 'rotate-180 text-black' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                 </button>
+                 
+                 <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedMobileCategory === link.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                   <div className="bg-gray-50/50 px-6 py-2 space-y-1 pb-4">
+                     <Link to={link.path} onClick={() => setIsMobileMenuOpen(false)} className="block py-2 text-sm text-black font-bold">Shop All {link.label}</Link>
+                     {link.subItems.map((sub, idx) => (
+                       <Link 
+                         key={idx} 
+                         to={sub.path} 
+                         onClick={() => setIsMobileMenuOpen(false)} 
+                         className="block py-2 text-sm text-gray-600 border-l-2 border-gray-200 hover:border-black pl-4 ml-1 transition-colors"
+                       >
+                         {sub.name}
+                       </Link>
+                     ))}
+                   </div>
+                 </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-      )}
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-white z-40 flex flex-col">
-          {/* Header with search and close */}
-          <div className="px-4 py-3 border-b border-gray-200 flex items-center gap-3">
-            <form onSubmit={handleSearch} className="relative flex-1">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="w-full px-4 py-2 pl-10 pr-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <button
-                type="submit"
-                className="absolute right-2 top-2 text-blue-600 hover:text-blue-700 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </form>
-            <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="p-2 text-gray-700 hover:bg-gray-100 rounded-md"
-              aria-label="Close menu"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Body */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Shop by category</p>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: 'Men', path: '/men' },
-                  { label: 'Women', path: '/women' },
-                  { label: 'Watches', path: '/watches' },
-                  { label: 'Lenses', path: '/lenses' },
-                  { label: 'Accessories', path: '/accessories' },
-                  { label: 'New Arrival', path: '/new-arrival' },
-                  { label: 'Sale', path: '/sale' },
-                ].map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-3 py-2 text-xs font-semibold text-gray-700 border border-gray-200 rounded-lg text-center hover:bg-gray-100 transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Men's subcategories</p>
-              <div className="flex flex-wrap gap-2">
-                {menCategories.map((cat) => (
-                  <Link
-                    key={cat.path}
-                    to={cat.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-3 py-1.5 text-[11px] font-semibold border border-gray-200 rounded-full text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    {cat.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Women's subcategories</p>
-              <div className="flex flex-wrap gap-2">
-                {womenCategories.map((cat) => (
-                  <Link
-                    key={cat.path}
-                    to={cat.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-3 py-1.5 text-[11px] font-semibold border border-gray-200 rounded-full text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    {cat.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Watch subcategories</p>
-              <div className="flex flex-wrap gap-2">
-                {genderOptions.map((gender) => (
-                  <Link
-                    key={gender.path}
-                    to={`/watches?gender=${gender.path}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-3 py-1.5 text-[11px] font-semibold border border-gray-200 rounded-full text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    {gender.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Lens subcategories</p>
-              <div className="flex flex-wrap gap-2">
-                {genderOptions.map((gender) => (
-                  <Link
-                    key={gender.path}
-                    to={`/lenses?gender=${gender.path}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-3 py-1.5 text-[11px] font-semibold border border-gray-200 rounded-full text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    {gender.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Quick links</p>
-              <div className="flex flex-wrap gap-2">
-                {['Wishlist', 'Cart', 'Profile'].map((item) => {
-                  const linkMap = { Wishlist: '/wishlist', Cart: '/cart', Profile: '/profile' };
-                  return (
-                    <Link
-                      key={item}
-                      to={linkMap[item]}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-full text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      {item}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* User Profile Section - Mobile */}
-          {isAuthenticated && (
-            <div className="border-t border-gray-200 p-4">
-              <Link
-                to="/profile"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-              >
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-lg font-semibold">
-                  {user?.name?.charAt(0).toUpperCase() || 'U'}
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">{user?.name || 'User'}</p>
-                  <p className="text-xs text-gray-500">{user?.email}</p>
-                </div>
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          )}
-
-          {/* Footer */}
-          <div className="border-t border-gray-200 p-4 space-y-3">
-            {!isAuthenticated ? (
-              <Link
-                to="/login"
-                className="block px-4 py-2.5 text-center font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Sign In
-              </Link>
-            ) : (
-              <button
-                onClick={() => {
-                  logout();
-                  setIsMobileMenuOpen(false);
-                  navigate('/');
-                }}
-                className="w-full px-4 py-2.5 text-center font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-              >
-                Sign Out
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     </>
   );
 };
