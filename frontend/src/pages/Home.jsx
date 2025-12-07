@@ -195,7 +195,7 @@ const Home = () => {
         {/* Mobile Banner */}
         <div className="block lg:hidden w-full">
           <Link to="/sale">
-            <img src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1764765679/Gemini_Generated_Image_cspotecspotecspo_mw6a6n.png" alt="Mobile Banner" className="w-full h-auto object-contain block" loading="eager" />
+            <img src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1765137210/Black_Elegant_Watch_Special_Offer_Instagram_Post_y3foz1.svg" alt="Mobile Banner" className="w-full h-auto object-contain block" loading="eager" />
           </Link>
         </div>
       </div>
