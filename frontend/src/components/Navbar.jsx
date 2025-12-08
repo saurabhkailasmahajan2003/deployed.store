@@ -174,7 +174,7 @@ const Navbar = () => {
               <Link to="/" className="flex-shrink-0 group relative z-10">
                  {/* Replace with your logo or text */}
                  <span className="font-serif text-2xl font-bold tracking-tighter text-black">
-                   URBAN<span className="text-gray-500 font-light italic">VERSA</span>.
+                   Urban<span className="text-gray-500 font-light italic">Vastra</span>.
                  </span>
               </Link>
             </div>

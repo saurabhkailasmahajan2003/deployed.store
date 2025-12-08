@@ -55,16 +55,16 @@ const fetchAccessories = async () => {
 
 // --- NEWS TICKER COMPONENT (New) ---
 const NewsTicker = () => {
-    const marqueeContent = "⚡ FREE SHIPPING ON ALL ORDERS OVER ₹999 ⚡ | ✨ NEW SEASON STYLES ADDED DAILY ✨ | 🎁 LIMITED TIME DISCOUNTS ON WATCHES 🎁 | 🛍️ JOIN OUR LOYALTY PROGRAM 🛍️";
-    
-    // NOTE: For the 'continuous' marquee animation, this CSS needs to be applied.
-    // In a real project, place this CSS in your global stylesheet (e.g., index.css).
-    // For a self-contained solution, we use the <style> tag here.
+  const marqueeContent = "⚡ FREE SHIPPING ON ALL ORDERS OVER ₹999 ⚡ | ✨ NEW SEASON STYLES ADDED DAILY ✨ | 🎁 LIMITED TIME DISCOUNTS ON WATCHES 🎁 | 🛍️ JOIN OUR LOYALTY PROGRAM 🛍️";
 
-    return (
-        <>
-        <style>
-            {`
+  // NOTE: For the 'continuous' marquee animation, this CSS needs to be applied.
+  // In a real project, place this CSS in your global stylesheet (e.g., index.css).
+  // For a self-contained solution, we use the <style> tag here.
+
+  return (
+    <>
+      <style>
+        {`
             @keyframes marquee {
                 0% { transform: translateX(0); }
                 100% { transform: translateX(-50%); }
@@ -73,16 +73,16 @@ const NewsTicker = () => {
                 animation: marquee 30s linear infinite;
             }
             `}
-        </style>
-        <div className="overflow-hidden bg-gray-900 text-white py-3 border-b border-gray-700">
-            <div className="whitespace-nowrap w-[200%] flex animate-marquee">
-                {/* Duplicate content to ensure seamless loop */}
-                <span className="text-sm font-medium tracking-wider mx-8">{marqueeContent}</span>
-                <span className="text-sm font-medium tracking-wider mx-8" aria-hidden="true">{marqueeContent}</span>
-            </div>
+      </style>
+      <div className="overflow-hidden bg-gray-900 text-white py-3 border-b border-gray-700">
+        <div className="whitespace-nowrap w-[200%] flex animate-marquee">
+          {/* Duplicate content to ensure seamless loop */}
+          <span className="text-sm font-medium tracking-wider mx-8">{marqueeContent}</span>
+          <span className="text-sm font-medium tracking-wider mx-8" aria-hidden="true">{marqueeContent}</span>
         </div>
-        </>
-    );
+      </div>
+    </>
+  );
 };
 
 
@@ -153,7 +153,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-800 pt-0">
-      
+
       {/* --- HERO SECTION (Restored & Top Margin Removed) --- */}
       <div className="relative w-full bg-gray-50 overflow-hidden group">
         <div className="hidden lg:block relative w-full">
@@ -176,10 +176,10 @@ const Home = () => {
           </div>
           {/* Controls */}
           <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white/90 text-gray-800 hover:bg-white shadow-lg transition opacity-0 group-hover:opacity-100 transform hover:scale-110">
-             <IconChevronLeft />
+            <IconChevronLeft />
           </button>
           <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white/90 text-gray-800 hover:bg-white shadow-lg transition opacity-0 group-hover:opacity-100 transform hover:scale-110">
-             <IconChevronRight />
+            <IconChevronRight />
           </button>
           {/* Indicators */}
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
@@ -199,14 +199,14 @@ const Home = () => {
           </Link>
         </div>
       </div>
-      
+
       {/* --- NEWS TICKER SECTION (New Continuous Marquee) --- */}
       <NewsTicker />
 
       {/* --- STORIES SECTION (Attractive Gradient Rings) --- */}
       <div className="py-8 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-rose-600 mb-6">Explore the Trends</h3>
+          <h3 className="text-xl font-bold uppercase tracking-widest text-gray-500 mb-5">Stories By UrbanVastra</h3>
           <div className="flex justify-start md:justify-center gap-6 overflow-x-auto scrollbar-hide pb-2 px-2">
             {stories.map((item, index) => (
               <div
@@ -226,11 +226,19 @@ const Home = () => {
         </div>
       </div>
 
+      <div className="w-fit m-0 p-0 leading-none overflow-visible h-auto w-auto">
+        <img
+          src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1765177832/e09e8f87-6c4a-4452-97ea-ca13fbc8f75a.png"
+          alt="Full size"
+          className="block w-auto h-auto m-0 p-0 border-none outline-none"
+        />
+      </div>
+
       {/* --- CATEGORY BANNERS (Attractive 3D Hover Effect) --- */}
       <div className="max-w-7xl mx-auto px-4 mt-12 mb-8">
         <div className="text-center mb-8">
-           <h2 className="text-3xl font-extrabold text-gray-900">Featured Collections</h2>
-           <p className="text-gray-500">Essential styles for him and her.</p>
+          <h2 className="text-3xl font-extrabold text-gray-900">Featured Collections</h2>
+          <p className="text-gray-500">Essential styles for him and her.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           <Link to="/women/shirt" className="block w-full overflow-hidden rounded-xl duration-300 group">
@@ -243,66 +251,76 @@ const Home = () => {
       </div>
 
       {/* --- PRODUCT SECTIONS (Improved Headers and Buttons) --- */}
-      
-      <ProductSection 
-        title="Fresh Drops" 
+
+      <ProductSection
+        title="Fresh Drops"
         subtitle="Be the first to wear the trend"
-        products={newArrivals} 
-        viewAllLink="/new-arrival" 
-        isLoading={isLoading} 
+        products={newArrivals}
+        viewAllLink="/new-arrival"
+        isLoading={isLoading}
       />
-      
-      <ProductSection 
-        title="Steal Deals" 
+      <div className="w-fit m-0 p-0 leading-none overflow-visible h-auto w-auto">
+        <img
+          src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1765176934/06ddc8a6-29de-44f5-887e-c6c960932c07.png"
+          alt="Full size"
+          className="block w-auto h-auto m-0 p-0 border-none outline-none"
+        />
+      </div>
+
+
+      <ProductSection
+        title="Steal Deals"
         subtitle="Premium styles at unbeatable prices"
-        products={saleItems} 
-        viewAllLink="/sale" 
-        bgColor="bg-gradient-to-br from-rose-50 to-white" 
-        isLoading={isLoading} 
+        products={saleItems}
+        viewAllLink="/sale"
+        bgColor="bg-gradient-to-br from-rose-50 to-white"
+        isLoading={isLoading}
       />
-      
+
+
+
       {/* 3. Men & Women - Grid Layout */}
       <div className="max-w-7xl mx-auto px-4 py-12">
-         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-extrabold text-gray-900">For Him</h2>
-                <Link to="/men" className="text-sm font-semibold text-rose-600 hover:text-rose-700 transition">View All</Link>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                 {isLoading ? [1,2].map(i => <SkeletonCard key={i}/>) : menItems.map(p => <ProductCard key={p._id} product={p}/>)}
-              </div>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-extrabold text-gray-900">For Him</h2>
+              <Link to="/men" className="text-sm font-semibold text-rose-600 hover:text-rose-700 transition">View All</Link>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-extrabold text-gray-900">For Her</h2>
-                <Link to="/women" className="text-sm font-semibold text-rose-600 hover:text-rose-700 transition">View All</Link>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                 {isLoading ? [1,2].map(i => <SkeletonCard key={i}/>) : womenItems.map(p => <ProductCard key={p._id} product={p}/>)}
-              </div>
+            <div className="grid grid-cols-2 gap-4">
+              {isLoading ? [1, 2].map(i => <SkeletonCard key={i} />) : menItems.map(p => <ProductCard key={p._id} product={p} />)}
             </div>
-         </div>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-extrabold text-gray-900">For Her</h2>
+              <Link to="/women" className="text-sm font-semibold text-rose-600 hover:text-rose-700 transition">View All</Link>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {isLoading ? [1, 2].map(i => <SkeletonCard key={i} />) : womenItems.map(p => <ProductCard key={p._id} product={p} />)}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 4. Accessories - Darker Section for contrast */}
       <div className="bg-gray-100 py-16 border-t border-gray-200">
-         <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl font-extrabold text-center mb-10 text-gray-900">Complete The Look</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-               {isLoading ? [1,2,3,4].map(i => <SkeletonCard key={i}/>) : (
-                 <>
-                   {watches.slice(0,2).map(p => <ProductCard key={p._id} product={p} />)}
-                   {accessories.slice(0,2).map(p => <ProductCard key={p._id} product={p} />)}
-                 </>
-               )}
-            </div>
-            <div className="text-center mt-10">
-               <Link to="/accessories" className="inline-block bg-rose-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-rose-700 transition shadow-xl transform hover:-translate-y-1">
-                 View All Accessories
-               </Link>
-            </div>
-         </div>
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-extrabold text-center mb-10 text-gray-900">Complete The Look</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {isLoading ? [1, 2, 3, 4].map(i => <SkeletonCard key={i} />) : (
+              <>
+                {watches.slice(0, 2).map(p => <ProductCard key={p._id} product={p} />)}
+                {accessories.slice(0, 2).map(p => <ProductCard key={p._id} product={p} />)}
+              </>
+            )}
+          </div>
+          <div className="text-center mt-10">
+            <Link to="/accessories" className="inline-block bg-rose-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-rose-700 transition shadow-xl transform hover:-translate-y-1">
+              View All Accessories
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* --- BROWSE BY CATEGORY (Attractive Grid) --- */}
@@ -312,9 +330,9 @@ const Home = () => {
           <p className="text-gray-500 mb-12">Find exactly what you are looking for</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { id: 'men', emoji: '👔', bg: 'bg-blue-50 text-blue-600' }, 
-              { id: 'women', emoji: '👗', bg: 'bg-pink-50 text-pink-600' }, 
-              { id: 'watches', emoji: '⌚', bg: 'bg-amber-50 text-amber-600' }, 
+              { id: 'men', emoji: '👔', bg: 'bg-blue-50 text-blue-600' },
+              { id: 'women', emoji: '👗', bg: 'bg-pink-50 text-pink-600' },
+              { id: 'watches', emoji: '⌚', bg: 'bg-amber-50 text-amber-600' },
               { id: 'lenses', emoji: '👓', bg: 'bg-teal-50 text-teal-600' }
             ].map((cat) => (
               <Link key={cat.id} to={`/${cat.id}`} className={`group relative h-48 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-1 ${cat.bg}`}>
@@ -330,7 +348,7 @@ const Home = () => {
       {isStoryViewerOpen && activeStoryIndex !== null && (
         <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center" onClick={() => setIsStoryViewerOpen(false)}>
           <button onClick={(e) => { e.stopPropagation(); setIsStoryViewerOpen(false); }} className="absolute top-6 right-6 z-20 text-white/70 hover:text-white transition bg-white/10 rounded-full p-2"><IconClose /></button>
-          
+
           {activeStoryIndex > 0 && <button onClick={(e) => { e.stopPropagation(); setActiveStoryIndex(activeStoryIndex - 1); }} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white hover:opacity-70 bg-white/10 rounded-full p-2"><IconChevronLeft /></button>}
           {activeStoryIndex < stories.length - 1 && <button onClick={(e) => { e.stopPropagation(); setActiveStoryIndex(activeStoryIndex + 1); }} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white hover:opacity-70 bg-white/10 rounded-full p-2"><IconChevronRight /></button>}
 
@@ -347,7 +365,7 @@ const Home = () => {
           </div>
         </div>
       )}
-      
+
       <ScrollToTop />
     </div>
   );
@@ -367,8 +385,8 @@ const ProductSection = ({ title, subtitle, products, viewAllLink, bgColor = 'bg-
             {subtitle && <p className="text-gray-500 mt-1">{subtitle}</p>}
           </div>
           {viewAllLink && (
-            <Link 
-              to={viewAllLink} 
+            <Link
+              to={viewAllLink}
               className="hidden sm:inline-block px-6 py-2 rounded-full border border-gray-300 font-semibold text-gray-700 bg-white hover:bg-gray-900 hover:text-white hover:border-transparent transition-all shadow-md transform hover:scale-[1.02]"
             >
               View All
@@ -378,7 +396,7 @@ const ProductSection = ({ title, subtitle, products, viewAllLink, bgColor = 'bg-
 
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-             {[1,2,3,4].map(i => <SkeletonCard key={i}/>)}
+            {[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -391,12 +409,12 @@ const ProductSection = ({ title, subtitle, products, viewAllLink, bgColor = 'bg-
             )}
           </div>
         )}
-        
+
         {/* Mobile View All Button (Visible only on small screens) */}
         {viewAllLink && (
-           <div className="mt-8 text-center sm:hidden">
-              <Link to={viewAllLink} className="inline-block px-8 py-3 rounded-full bg-gray-900 text-white font-semibold shadow-lg">View All</Link>
-           </div>
+          <div className="mt-8 text-center sm:hidden">
+            <Link to={viewAllLink} className="inline-block px-8 py-3 rounded-full bg-gray-900 text-white font-semibold shadow-lg">View All</Link>
+          </div>
         )}
       </div>
     </section>
