@@ -392,7 +392,7 @@ const Home = () => {
                   <img 
                     src={cat.image} 
                     alt={cat.label} 
-                    className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 scale-100 group-hover:scale-105 transition-all duration-500" 
+                    className="w-full h-full object-cover filter md:grayscale group-hover:grayscale-0 scale-100 group-hover:scale-105 transition-all duration-500" 
                   />
                   {/* Overlay - Lighter for Light Theme */}
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-500"></div>
