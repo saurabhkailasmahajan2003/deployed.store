@@ -17,7 +17,6 @@ export const WishlistProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { isAuthenticated } = useAuth();
 
-  // Load wishlist from backend when user is authenticated
   useEffect(() => {
     if (isAuthenticated) {
       loadWishlist();
@@ -26,57 +25,80 @@ export const WishlistProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
+  // ---------------------------
+  // LOAD WISHLIST
+  // ---------------------------
   const loadWishlist = async () => {
     try {
       setIsLoading(true);
       const response = await wishlistAPI.getWishlist();
-      if (response.success) {
-        setWishlist(response.data.wishlist.products || []);
-      }
+
+      const products =
+        response?.data?.wishlist?.products ||
+        response?.data?.wishlist ||
+        response?.data?.products ||
+        [];
+
+      setWishlist([...products]); // always a new array
     } catch (error) {
-      console.error('Error loading wishlist:', error);
+      console.error("Error loading wishlist:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // ---------------------------
+  // ADD TO WISHLIST
+  // ---------------------------
   const addToWishlist = async (product) => {
-    if (!isAuthenticated) {
-      throw new Error('Please login to add items to wishlist');
-    }
+    if (!isAuthenticated) throw new Error("Please login to add items.");
 
     try {
-      const response = await wishlistAPI.addToWishlist(product);
-      if (response.success) {
-        setWishlist(response.data.wishlist.products || []);
-      }
+      const productId = product._id;
+      const response = await wishlistAPI.addToWishlist(productId);
+
+      const products =
+        response?.data?.wishlist?.products ||
+        response?.data?.wishlist ||
+        response?.data?.products ||
+        [];
+
+      setWishlist([...products]);
     } catch (error) {
+      console.error("Add wishlist error:", error);
       throw error;
     }
   };
 
+  // ---------------------------
+  // REMOVE FROM WISHLIST
+  // ---------------------------
   const removeFromWishlist = async (productId) => {
-    if (!isAuthenticated) {
-      return;
-    }
+    if (!isAuthenticated) return;
 
     try {
       const response = await wishlistAPI.removeFromWishlist(productId);
-      if (response.success) {
-        setWishlist(response.data.wishlist.products || []);
-      }
+
+      const products =
+        response?.data?.wishlist?.products ||
+        response?.data?.wishlist ||
+        response?.data?.products ||
+        [];
+
+      setWishlist([...products]);
     } catch (error) {
-      console.error('Error removing from wishlist:', error);
+      console.error("Remove wishlist error:", error);
     }
   };
 
+  // ---------------------------
+  // CHECK IF IN WISHLIST
+  // ---------------------------
   const isInWishlist = (productId) => {
-    return wishlist.some((item) => item.id === productId);
+    return wishlist.some((item) => item._id === productId);
   };
 
-  const getWishlistCount = () => {
-    return wishlist.length;
-  };
+  const getWishlistCount = () => wishlist.length;
 
   return (
     <WishlistContext.Provider
@@ -94,4 +116,3 @@ export const WishlistProvider = ({ children }) => {
     </WishlistContext.Provider>
   );
 };
-
