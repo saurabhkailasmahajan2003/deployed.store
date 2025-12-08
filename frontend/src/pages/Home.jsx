@@ -123,7 +123,7 @@ const NewsTicker = () => {
             }
             `}
       </style>
-      <div className="overflow-hidden bg-gray-900 text-white py-3 border-b border-gray-700">
+      <div className="overflow-hidden bg-black text-white py-3 border-b border-gray-700">
         <div className="whitespace-nowrap w-[200%] flex animate-marquee">
           {/* Duplicate content to ensure seamless loop */}
           <span className="text-sm font-medium tracking-wider mx-8">{marqueeContent}</span>
