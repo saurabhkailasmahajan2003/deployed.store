@@ -359,7 +359,6 @@ const Profile = () => {
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                                             <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
-                                            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
@@ -381,9 +380,6 @@ const Profile = () => {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 text-right font-medium">
                                                     ₹{order.totalAmount?.toLocaleString()}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <a href="#" className="text-zinc-900 hover:text-zinc-600">Details</a>
                                                 </td>
                                             </tr>
                                         ))}

@@ -95,13 +95,34 @@ const SignUp = () => {
         style={{ backgroundImage: "url('https://res.cloudinary.com/de1bg8ivx/image/upload/v1765260333/UrbanVastra_1_ndsc5c.svg')" }}
       >
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-8">
-            <span className="text-xl font-bold tracking-wide text-white"></span>
+          <div className="flex items-center gap-3 mb-8">
+            {/* E-commerce Logo */}
+            <div className="relative">
+              <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 14L10 38H32L30 14H12Z" fill="url(#bagGradientLight3)" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M14 14V10C14 7.79086 15.7909 6 18 6H24C26.2091 6 28 7.79086 28 10V14" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                <text x="21" y="28" fontFamily="Arial, sans-serif" fontSize="12" fontWeight="900" fill="white" textAnchor="middle" letterSpacing="-1">ST</text>
+                <defs>
+                  <linearGradient id="bagGradientLight3" x1="10" y1="14" x2="30" y2="38" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0.3)"/>
+                    <stop offset="100%" stopColor="rgba(255,255,255,0.15)"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold text-white leading-none tracking-tight">
+                StyleTrending
+              </span>
+              <span className="text-[9px] font-medium text-gray-300 uppercase tracking-widest mt-0.5">
+                Fashion & Lifestyle
+              </span>
+            </div>
           </div>
         </div>
         <div className="relative z-10 text-sm text-gray-200 drop-shadow-sm">
           <div className="relative z-10 text-sm text-gray-200 drop-shadow-sm -ml-3">
-             <span className='text-white'>© 2024 UrbanVastra.</span> All rights reserved.
+             <span className='text-white'>© 2024 StyleTrending.</span> All rights reserved.
           </div>
         </div>
       </div>

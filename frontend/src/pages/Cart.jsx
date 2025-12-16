@@ -44,24 +44,24 @@ const Cart = () => {
   const progress = Math.min((cartTotal / freeShippingThreshold) * 100, 100);
   const remainingForFreeShip = freeShippingThreshold - cartTotal;
 
-  // --- Empty State ---
+  // --- Professional Empty State ---
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center py-20 px-4">
-        <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 animate-pulse">
-            <svg className="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-20 px-4">
+        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-gray-100">
+            <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-3">Your bag is empty</h1>
-        <p className="text-gray-500 mb-8 text-center max-w-md">
-          The reality is that you haven't added any items to your cart yet. Let's change that.
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Your shopping bag is empty</h1>
+        <p className="text-gray-600 mb-8 text-center max-w-sm text-sm">
+          Add items to your bag to continue shopping.
         </p>
         <Link
           to="/"
-          className="group relative inline-flex items-center justify-center px-8 py-3 bg-zinc-900 text-white font-medium rounded-full overflow-hidden transition-all hover:bg-zinc-800 hover:shadow-lg hover:-translate-y-0.5"
+          className="inline-flex items-center justify-center px-6 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors shadow-sm"
         >
-          <span className="relative z-10">Start Shopping</span>
+          Continue Shopping
         </Link>
       </div>
     );
@@ -70,58 +70,65 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-900 pb-20">
       
-      {/* 1. Progress Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <Link to="/" className="flex items-center text-sm font-medium text-gray-500 hover:text-black transition-colors">
-                <IconArrowLeft className="w-4 h-4 mr-2" />
+      {/* Professional Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+            <Link to="/" className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+                <IconArrowLeft className="w-4 h-4 mr-1.5" />
                 Continue Shopping
             </Link>
             
-            <div className="hidden md:flex items-center space-x-2 text-sm">
-                <span className="font-bold text-black">Bag</span>
-                <span className="text-gray-300">/</span>
-                <span className="text-gray-400">Checkout</span>
-                <span className="text-gray-300">/</span>
-                <span className="text-gray-400">Payment</span>
+            <div className="hidden md:flex items-center space-x-2 text-xs font-medium">
+                <span className="text-gray-900">Shopping Bag</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-500">Checkout</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-500">Payment</span>
             </div>
 
             <div className="flex items-center text-xs font-medium text-gray-500">
-                <IconLock className="w-3 h-3 mr-1" />
-                Secure
+                <IconLock className="w-3.5 h-3.5 mr-1.5" />
+                Secure Checkout
             </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Bag</h1>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-1">Shopping Bag</h1>
+          <p className="text-sm text-gray-600">{cart.length} {cart.length === 1 ? 'item' : 'items'}</p>
+        </div>
 
         <div className="lg:grid lg:grid-cols-12 lg:gap-10 items-start">
           
           {/* --- LEFT COLUMN: Cart Items --- */}
           <div className="lg:col-span-8">
             
-            {/* Free Shipping Progress Bar */}
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
-                <div className="flex items-center justify-between mb-2">
+            {/* Professional Shipping Progress Bar */}
+            <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm mb-6">
+                <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-medium text-gray-700">
                         {remainingForFreeShip > 0 
-                            ? `Spend ₹${remainingForFreeShip.toLocaleString()} more for free shipping` 
-                            : "You've unlocked Free Shipping!"}
+                            ? `Add ₹${remainingForFreeShip.toLocaleString()} more for free shipping` 
+                            : "✓ Free shipping unlocked"}
                     </span>
-                    <span className="text-xs font-bold text-gray-900">{Math.round(progress)}%</span>
+                    {remainingForFreeShip > 0 && (
+                      <span className="text-xs font-semibold text-gray-600">{Math.round(progress)}%</span>
+                    )}
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                     <div 
-                        className="bg-black h-2 rounded-full transition-all duration-1000 ease-out" 
+                        className={`h-2 rounded-full transition-all duration-1000 ease-out ${
+                          remainingForFreeShip > 0 ? 'bg-gray-700' : 'bg-green-600'
+                        }`}
                         style={{ width: `${progress}%` }}
                     ></div>
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
               {/* Desktop Header */}
-              <div className="hidden sm:grid grid-cols-12 gap-4 px-8 py-4 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <div className="hidden sm:grid grid-cols-12 gap-4 px-6 py-3.5 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 <div className="col-span-6">Product</div>
                 <div className="col-span-3 text-center">Quantity</div>
                 <div className="col-span-3 text-right">Total</div>
@@ -141,31 +148,33 @@ const Cart = () => {
                   const productPrice = product.finalPrice || product.price || 0;
                   
                   return (
-                    <div key={itemId} className="p-6 sm:p-8 hover:bg-gray-50/50 transition-colors duration-200">
-                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+                    <div key={itemId} className="p-5 sm:p-6 border-b border-gray-100 last:border-0 hover:bg-gray-50/30 transition-colors">
+                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 items-center">
                         
                         {/* Product Info (Col 6) */}
-                        <div className="sm:col-span-6 flex gap-6">
-                          <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 group">
+                        <div className="sm:col-span-6 flex gap-4">
+                          <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-gray-50 rounded-md overflow-hidden border border-gray-200">
                             <img
                               src={productImage}
                               alt={product.name || 'Product'}
-                              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                              className="w-full h-full object-cover"
                               onError={(e) => handleImageError(e, 200, 200)}
                             />
                           </div>
-                          <div className="flex flex-col justify-center">
-                            <h3 className="text-base font-semibold text-gray-900">
+                          <div className="flex flex-col justify-center min-w-0 flex-1">
+                            <h3 className="text-sm sm:text-base font-medium text-gray-900 truncate">
                                 <Link to={`/product/${product.category || 'shop'}/${itemId}`} className="hover:text-gray-600 transition-colors">
                                     {product.name || 'Product'}
                                 </Link>
                             </h3>
-                            <p className="mt-1 text-sm text-gray-500">{product.brand || 'Premium Brand'}</p>
-                            <p className="mt-1 text-sm font-medium text-gray-900">₹{productPrice.toLocaleString()}</p>
+                            {product.brand && (
+                              <p className="mt-0.5 text-xs sm:text-sm text-gray-500">{product.brand}</p>
+                            )}
+                            <p className="mt-1 text-sm font-semibold text-gray-900">₹{productPrice.toLocaleString()}</p>
                             {/* Mobile Only Remove */}
                             <button 
                                 onClick={() => removeFromCart(itemId)}
-                                className="sm:hidden mt-3 text-xs text-red-600 font-medium flex items-center"
+                                className="sm:hidden mt-2 text-xs text-red-600 font-medium flex items-center hover:text-red-700"
                             >
                                 <IconTrash className="w-3 h-3 mr-1" /> Remove
                             </button>
@@ -174,32 +183,32 @@ const Cart = () => {
 
                         {/* Quantity (Col 3) */}
                         <div className="sm:col-span-3 flex justify-start sm:justify-center">
-                            <div className="flex items-center border border-gray-300 rounded-full h-10 w-32 shadow-sm">
+                            <div className="flex items-center border border-gray-300 rounded-md h-9 w-28">
                                 <button 
                                     onClick={() => updateQuantity(itemId, item.quantity - 1)}
                                     disabled={item.quantity <= 1}
-                                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-100 rounded-l-full disabled:opacity-30 transition-colors"
+                                    className="w-9 h-full flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-r border-gray-300"
                                 >
-                                    <IconMinus className="w-3 h-3" />
+                                    <IconMinus className="w-3.5 h-3.5" />
                                 </button>
                                 <span className="flex-1 text-center text-sm font-semibold text-gray-900">{item.quantity}</span>
                                 <button 
                                     onClick={() => updateQuantity(itemId, item.quantity + 1)}
-                                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-100 rounded-r-full transition-colors"
+                                    className="w-9 h-full flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border-l border-gray-300"
                                 >
-                                    <IconPlus className="w-3 h-3" />
+                                    <IconPlus className="w-3.5 h-3.5" />
                                 </button>
                             </div>
                         </div>
 
                         {/* Price & Remove (Col 3) */}
-                        <div className="sm:col-span-3 flex flex-row sm:flex-col justify-between sm:justify-center items-center sm:items-end">
-                            <span className="text-sm sm:hidden font-medium text-gray-500">Total:</span>
+                        <div className="sm:col-span-3 flex flex-row sm:flex-col justify-between sm:justify-center items-center sm:items-end gap-2">
+                            <span className="text-sm sm:hidden font-medium text-gray-600">Total:</span>
                             <div className="text-right">
-                                <p className="text-lg font-bold text-gray-900">₹{(productPrice * item.quantity).toLocaleString()}</p>
+                                <p className="text-base sm:text-lg font-semibold text-gray-900">₹{(productPrice * item.quantity).toLocaleString()}</p>
                                 <button 
                                     onClick={() => removeFromCart(itemId)}
-                                    className="hidden sm:flex items-center justify-end mt-2 text-xs text-gray-400 hover:text-red-600 transition-colors"
+                                    className="hidden sm:flex items-center justify-end mt-2 text-xs text-gray-500 hover:text-red-600 transition-colors"
                                 >
                                     <IconTrash className="w-3 h-3 mr-1" /> Remove
                                 </button>
@@ -214,35 +223,35 @@ const Cart = () => {
             </div>
           </div>
 
-          {/* --- RIGHT COLUMN: Summary --- */}
+          {/* --- Professional RIGHT COLUMN: Summary --- */}
           <div className="lg:col-span-4 mt-8 lg:mt-0">
-            <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6 sm:p-8 sticky top-24">
-              <h2 className="text-lg font-bold text-gray-900 mb-6">Order Summary</h2>
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 sticky top-20">
+              <h2 className="text-lg font-semibold text-gray-900 mb-6 pb-4 border-b border-gray-200">Order Summary</h2>
 
-              <dl className="space-y-4 text-sm">
-                <div className="flex justify-between text-gray-500">
-                  <dt>Subtotal</dt>
+              <dl className="space-y-3.5 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-gray-600">Subtotal</dt>
                   <dd className="font-medium text-gray-900">₹{getCartTotal().toLocaleString()}</dd>
                 </div>
-                <div className="flex justify-between items-center text-gray-500">
-                  <dt className="flex items-center">
+                <div className="flex justify-between items-center">
+                  <dt className="flex items-center text-gray-600">
                       Shipping
-                      {remainingForFreeShip <= 0 && <IconCheck className="w-4 h-4 text-green-500 ml-1" />}
+                      {remainingForFreeShip <= 0 && <IconCheck className="w-3.5 h-3.5 text-green-600 ml-1.5" />}
                   </dt>
-                  <dd className="font-medium text-green-600">
+                  <dd className={`font-medium ${remainingForFreeShip <= 0 ? 'text-green-600' : 'text-gray-900'}`}>
                       {remainingForFreeShip <= 0 ? 'Free' : 'Calculated at checkout'}
                   </dd>
                 </div>
-                <div className="flex justify-between text-gray-500 pb-4 border-b border-gray-100">
-                  <dt>Tax Estimate</dt>
+                <div className="flex justify-between pb-4 border-b border-gray-200">
+                  <dt className="text-gray-600">Tax Estimate</dt>
                   <dd className="font-medium text-gray-900">₹0.00</dd>
                 </div>
 
-                <div className="flex justify-between items-center pt-2">
-                  <dt className="text-base font-bold text-gray-900">Total</dt>
-                  <dd className="text-2xl font-bold text-gray-900">₹{getCartTotal().toLocaleString()}</dd>
+                <div className="flex justify-between items-center pt-3">
+                  <dt className="text-base font-semibold text-gray-900">Total</dt>
+                  <dd className="text-xl font-semibold text-gray-900">₹{getCartTotal().toLocaleString()}</dd>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">Including GST</p>
+                <p className="text-xs text-gray-500 mt-1">Including GST</p>
               </dl>
 
               {/* Promo Code Accordion Style */}
@@ -267,21 +276,22 @@ const Cart = () => {
                    </details>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-6 pt-6 border-t border-gray-200">
                 <button
                   onClick={() => navigate('/checkout')}
-                  className="w-full flex items-center justify-center px-6 py-4 bg-black text-white text-base font-bold rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-md hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="w-full flex items-center justify-center px-6 py-3 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors shadow-sm"
                 >
-                  Checkout
+                  Proceed to Checkout
                 </button>
-                <p className="mt-4 text-center text-xs text-gray-500">
+                <p className="mt-3 text-center text-xs text-gray-500">
                     Free shipping on orders over ₹1,000
                 </p>
               </div>
 
-              {/* Professional Payment Icons (SVG) */}
-              <div className="mt-8 border-t border-gray-100 pt-6">
-                 <div className="flex justify-center gap-3 grayscale opacity-60">
+              {/* Payment Icons */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                 <p className="text-xs font-medium text-gray-500 mb-3 text-center">Secure Payment</p>
+                 <div className="flex justify-center gap-4 opacity-60">
                     {/* Visa */}
                     <svg className="h-6" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="24" rx="4" fill="#F3F4F6"/><path d="M14.07 15.631H16.485L18 8.42H15.657C15.12 8.42 14.628 8.736 14.436 9.197L12.333 14.238L10.153 9.197C9.972 8.71 9.564 8.42 8.949 8.42H5.733L5.617 8.974C6.828 9.243 7.824 9.612 8.718 10.536C9.564 11.433 9.513 11.248 9.87 13.069L8.475 19.82H11.025L14.07 15.631ZM25.047 15.631H27.423L29.562 8.42H27.051L25.047 15.631ZM30.048 15.631H32.412L34.347 8.42H32.001L30.048 15.631ZM23.355 8.42L21.498 17.544C21.396 17.925 21.6 18.2 21.996 18.2H24.288L26.31 8.42H23.355Z" fill="#1A1F71"/></svg>
                     {/* Mastercard */}

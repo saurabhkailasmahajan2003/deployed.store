@@ -22,6 +22,7 @@ import SizeGuide from './pages/SizeGuide';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import CookiePolicy from './pages/CookiePolicy';
+import OrderSuccess from './pages/OrderSuccess';
 import CookieConsent from './components/CookieConsent';
 
 function AppContent() {
@@ -60,6 +61,7 @@ function AppContent() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/cookie-policy" element={<CookiePolicy />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
         </Routes>
       </main>
       {!isAdminRoute && <Footer />}

@@ -170,10 +170,35 @@ const Navbar = () => {
               </button>
 
               <Link to="/" className="flex-shrink-0 group relative z-10">
-                 {/* Replace with your logo or text */}
-                 <span className="font-serif text-2xl font-bold tracking-tighter text-black">
-                   Urban<span className="text-gray-500 font-light italic">Vastra</span>.
-                 </span>
+                 {/* E-commerce Logo Design */}
+                 <div className="flex items-center gap-3">
+                   {/* Shopping Bag Icon */}
+                   <div className="relative">
+                     <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg" className="transform group-hover:scale-105 transition-transform duration-300">
+                       {/* Bag body */}
+                       <path d="M12 14L10 38H32L30 14H12Z" fill="url(#bagGradient)" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                       {/* Bag handles */}
+                       <path d="M14 14V10C14 7.79086 15.7909 6 18 6H24C26.2091 6 28 7.79086 28 10V14" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                       {/* Stylized "ST" monogram inside */}
+                       <text x="21" y="28" fontFamily="Arial, sans-serif" fontSize="12" fontWeight="900" fill="white" textAnchor="middle" letterSpacing="-1">ST</text>
+                       <defs>
+                         <linearGradient id="bagGradient" x1="10" y1="14" x2="30" y2="38" gradientUnits="userSpaceOnUse">
+                           <stop offset="0%" stopColor="#1a1a1a"/>
+                           <stop offset="100%" stopColor="#000000"/>
+                         </linearGradient>
+                       </defs>
+                     </svg>
+                   </div>
+                   {/* Brand Name */}
+                   <div className="flex flex-col">
+                     <span className="text-2xl font-bold text-black leading-none tracking-tight">
+                       StyleTrending
+                     </span>
+                     <span className="text-[9px] font-medium text-gray-500 uppercase tracking-widest mt-0.5">
+                       Fashion & Lifestyle
+                     </span>
+                   </div>
+                 </div>
               </Link>
             </div>
 
