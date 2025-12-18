@@ -90,17 +90,17 @@ function AppContent() {
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <CartProvider>
+    <AuthProvider>
+      <CartProvider>
           <WishlistProvider>
             <ToastProvider>
-              <Router>
-                <AppContent />
-              </Router>
+        <Router>
+          <AppContent />
+        </Router>
             </ToastProvider>
           </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
+      </CartProvider>
+    </AuthProvider>
     </ErrorBoundary>
   );
 }
