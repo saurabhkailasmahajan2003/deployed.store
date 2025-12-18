@@ -36,6 +36,7 @@ const ProductCard = ({ product }) => {
   }
   
   const isWatch = (product.category || '').toLowerCase().includes('watch');
+  const isLens = (product.category || '').toLowerCase().includes('lens');
   const sizes = isWatch ? [] : (product.sizes || ['S', 'M', 'L', 'XL']); 
   const finalPrice = product.finalPrice || product.price || product.mrp || 0;
   const originalPrice = product.originalPrice || product.mrp || product.price || 0;
@@ -43,9 +44,24 @@ const ProductCard = ({ product }) => {
   const productId = product._id || product.id;
   
   // Get the image source with fallback
-  const imageSrc = productImages.length > 0 
-    ? (isHovered && productImages.length > 1 ? productImages[1] : productImages[0])
-    : 'https://via.placeholder.com/400x500?text=No+Image';
+  // For lenses, use the 2nd image (index 1) as default if available
+  let defaultImageIndex = 0;
+  if (isLens && productImages.length > 1) {
+    defaultImageIndex = 1; // Use 2nd image (image2) for lenses
+  }
+  
+  // Determine which image to show
+  let imageSrc = 'https://via.placeholder.com/400x500?text=No+Image';
+  if (productImages.length > 0) {
+    if (isHovered) {
+      // On hover, show next image if available
+      const hoverIndex = defaultImageIndex + 1;
+      imageSrc = productImages.length > hoverIndex ? productImages[hoverIndex] : productImages[defaultImageIndex];
+    } else {
+      // Default: show the appropriate image based on product type
+      imageSrc = productImages[defaultImageIndex];
+    }
+  }
 
   const handleAddClick = (e) => {
     e.preventDefault();

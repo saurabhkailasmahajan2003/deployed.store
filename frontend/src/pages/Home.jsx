@@ -13,11 +13,13 @@ const IconClose = () => <svg className="w-8 h-8" fill="none" stroke="currentColo
 // --- API FETCH FUNCTIONS (Kept from previous version) ---
 const fetchFreshDrops = async () => {
   try {
-    const [menShoes, womenShoes, accessories, watches] = await Promise.all([
+    const [menShoes, womenShoes, accessories, watches, lenses, mensLenses] = await Promise.all([
       productAPI.getMenItems({ limit: 10, category: 'shoes' }),
       productAPI.getWomenItems({ limit: 10, category: 'shoes' }),
       productAPI.getAccessories({ limit: 10 }),
-      productAPI.getWatches({ limit: 10 })
+      productAPI.getWatches({ limit: 10 }),
+      productAPI.getLenses({ limit: 10 }),
+      productAPI.getLenses({ limit: 10, gender: 'men' })
     ]);
     
     // Combine shoes from men and women, take exactly 10
@@ -40,8 +42,18 @@ const fetchFreshDrops = async () => {
       ? watches.data.products.slice(0, 10) 
       : [];
     
-    // Combine all: 10 shoes + 10 accessories + 10 watches = 30 products total
-    return [...shoes, ...acc, ...watch];
+    // Get exactly 10 lenses
+    const lens = lenses.success && lenses.data.products 
+      ? lenses.data.products.slice(0, 10) 
+      : [];
+    
+    // Get exactly 10 men's lenses
+    const mensLens = mensLenses.success && mensLenses.data.products 
+      ? mensLenses.data.products.slice(0, 10) 
+      : [];
+    
+    // Combine all: 10 shoes + 10 accessories + 10 watches + 10 lenses + 10 men's lenses = 50 products total
+    return [...shoes, ...acc, ...watch, ...lens, ...mensLens];
   } catch (error) {
     console.error("Error fetching fresh drops:", error);
     return [];
@@ -218,7 +230,8 @@ const Home = () => {
   const carouselSlides = [
     { image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765179209/62987769-6299-4622-965f-168e87ee3572.png', link: '/watches' },
     { image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765186313/12de4e83-d480-42c3-ad1d-7078f5d19074.png', link: '/men' },
-    { image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765179353/3f1d3d63-ed99-45d8-af35-94c5cdab655c.png', link: '/women' }
+    { image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765179353/3f1d3d63-ed99-45d8-af35-94c5cdab655c.png', link: '/women' },
+    { image: 'https://cmsimages.shoppersstop.com/main_pb_main_web_e1bd1656a9/main_pb_main_web_e1bd1656a9.png', link: '/sale' }
   ];
 
   // --- CAROUSEL LOGIC ---
