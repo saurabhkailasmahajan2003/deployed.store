@@ -11,9 +11,41 @@ const IconChevronRight = () => <svg className="w-6 h-6" fill="none" stroke="curr
 const IconClose = () => <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>;
 
 // --- API FETCH FUNCTIONS (Kept from previous version) ---
-const fetchNewArrivals = async () => {
-  const res = await productAPI.getAllProducts({ limit: 4, isNewArrival: true, sort: 'createdAt', order: 'desc' });
-  return res.success ? res.data.products : [];
+const fetchFreshDrops = async () => {
+  try {
+    const [menShoes, womenShoes, accessories, watches] = await Promise.all([
+      productAPI.getMenItems({ limit: 10, category: 'shoes' }),
+      productAPI.getWomenItems({ limit: 10, category: 'shoes' }),
+      productAPI.getAccessories({ limit: 10 }),
+      productAPI.getWatches({ limit: 10 })
+    ]);
+    
+    // Combine shoes from men and women, take exactly 10
+    let allShoes = [];
+    if (menShoes.success && menShoes.data.products) {
+      allShoes = [...allShoes, ...menShoes.data.products];
+    }
+    if (womenShoes.success && womenShoes.data.products) {
+      allShoes = [...allShoes, ...womenShoes.data.products];
+    }
+    const shoes = allShoes.slice(0, 10);
+    
+    // Get exactly 10 accessories
+    const acc = accessories.success && accessories.data.products 
+      ? accessories.data.products.slice(0, 10) 
+      : [];
+    
+    // Get exactly 10 watches
+    const watch = watches.success && watches.data.products 
+      ? watches.data.products.slice(0, 10) 
+      : [];
+    
+    // Combine all: 10 shoes + 10 accessories + 10 watches = 30 products total
+    return [...shoes, ...acc, ...watch];
+  } catch (error) {
+    console.error("Error fetching fresh drops:", error);
+    return [];
+  }
 };
 
 const fetchSaleItems = async () => {
@@ -143,7 +175,7 @@ const Home = () => {
   const lifestyleScrollRef = useRef(null);
 
   // --- DATA STATE & FETCHING (Unchanged) ---
-  const [newArrivals, setNewArrivals] = useState([]);
+  const [freshDrops, setFreshDrops] = useState([]);
   const [saleItems, setSaleItems] = useState([]);
   const [menItems, setMenItems] = useState([]);
   const [womenItems, setWomenItems] = useState([]);
@@ -154,10 +186,10 @@ const Home = () => {
     const loadAllData = async () => {
       setIsLoading(true);
       try {
-        const [newArrivalsData, saleData, menData, womenData, watchesData, accessoriesData] = await Promise.all([
-          fetchNewArrivals(), fetchSaleItems(), fetchMen(), fetchWomen(), fetchWatches(), fetchAccessories()
+        const [freshDropsData, saleData, menData, womenData, watchesData, accessoriesData] = await Promise.all([
+          fetchFreshDrops(), fetchSaleItems(), fetchMen(), fetchWomen(), fetchWatches(), fetchAccessories()
         ]);
-        setNewArrivals(newArrivalsData);
+        setFreshDrops(freshDropsData);
         setSaleItems(saleData);
         setMenItems(menData);
         setWomenItems(womenData);
@@ -446,8 +478,8 @@ const Home = () => {
       <ProductSection
         title="Fresh Drops"
         subtitle="Be the first to wear the trend"
-        products={newArrivals}
-        viewAllLink="/new-arrival"
+        products={freshDrops}
+        viewAllLink="/men/shoes"
         isLoading={isLoading}
       />
       <div className="w-fit m-0 p-0 leading-none overflow-visible h-auto w-auto hidden lg:block">
