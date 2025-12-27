@@ -80,29 +80,59 @@ const Invoice = ({ order, user, onPrint, onDownload }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-gray-200">
           <div>
             <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">From</h3>
-            <div className="space-y-1 text-sm">
-              <p className="font-bold text-gray-900">StyleTrending</p>
-              <p className="text-gray-600">Fashion & Lifestyle Store</p>
-              <p className="text-gray-600">Email: support@styletrending.com</p>
-              <p className="text-gray-600">Phone: +91 1800-XXX-XXXX</p>
+            <div className="space-y-1.5 text-sm">
+              <p className="font-bold text-gray-900 text-base">StyleTrending</p>
+              <p className="text-gray-700">Fashion & Lifestyle Store</p>
+              <div className="space-y-1 mt-2">
+                <p className="text-gray-700">
+                  <span className="font-medium">Email:</span> support@styletrending.com
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-medium">Phone:</span> +91 1800-XXX-XXXX
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-medium">Address:</span> Your Business Address, City, State - PIN
+                </p>
+              </div>
             </div>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Bill To</h3>
-            <div className="space-y-1 text-sm">
-              <p className="font-bold text-gray-900">{order?.shippingAddress?.name || user?.name || 'Customer'}</p>
-              {order?.shippingAddress?.address && (
-                <p className="text-gray-600">{order.shippingAddress.address}</p>
-              )}
-              {order?.shippingAddress?.city && (
-                <p className="text-gray-600">
-                  {order.shippingAddress.city}
-                  {order.shippingAddress.state && `, ${order.shippingAddress.state}`}
-                  {order.shippingAddress.zipCode && ` - ${order.shippingAddress.zipCode}`}
+            <div className="space-y-2 text-sm">
+              <div>
+                <p className="font-bold text-gray-900 text-base mb-1">
+                  {order?.shippingAddress?.name || user?.name || 'Customer'}
                 </p>
-              )}
-              {order?.shippingAddress?.phone && (
-                <p className="text-gray-600">Phone: {order.shippingAddress.phone}</p>
+              </div>
+              <div className="space-y-1">
+                {user?.email && (
+                  <p className="text-gray-700">
+                    <span className="font-medium">Email:</span> {user.email}
+                  </p>
+                )}
+                {(order?.shippingAddress?.phone || user?.phone) && (
+                  <p className="text-gray-700">
+                    <span className="font-medium">Phone:</span> {order?.shippingAddress?.phone || user?.phone}
+                  </p>
+                )}
+              </div>
+              {(order?.shippingAddress?.address || order?.shippingAddress?.city) && (
+                <div className="mt-3 pt-2 border-t border-gray-200 space-y-1">
+                  <p className="text-xs font-medium text-gray-500 uppercase mb-1">Shipping Address</p>
+                  {order?.shippingAddress?.address && (
+                    <p className="text-gray-700">{order.shippingAddress.address}</p>
+                  )}
+                  {order?.shippingAddress?.city && (
+                    <p className="text-gray-700">
+                      {order.shippingAddress.city}
+                      {order.shippingAddress.state && `, ${order.shippingAddress.state}`}
+                      {order.shippingAddress.zipCode && ` - ${order.shippingAddress.zipCode}`}
+                    </p>
+                  )}
+                  {order?.shippingAddress?.country && (
+                    <p className="text-gray-700">{order.shippingAddress.country}</p>
+                  )}
+                </div>
               )}
             </div>
           </div>
