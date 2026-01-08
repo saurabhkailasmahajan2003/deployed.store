@@ -38,3 +38,31 @@ html {
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
+
+@keyframes scroll-text {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-25%);
+  }
+}
+
+.animate-scroll-text {
+  animation: scroll-text 15s linear infinite;
+  will-change: transform;
+}
+
+@keyframes scroll-text-from-right {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-25%);
+  }
+}
+
+.animate-scroll-text-from-right {
+  animation: scroll-text-from-right 15s linear infinite;
+  will-change: transform;
+}

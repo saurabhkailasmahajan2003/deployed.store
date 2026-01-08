@@ -1,121 +1,150 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import AutoCarousel from './AutoCarousel';
 
 const Footer = () => {
+  const [email, setEmail] = useState('');
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    console.log('Subscribing:', email);
+    setEmail('');
+  };
+
+  // Reusable component for DEPLOYED with trademark symbols
+  const DeployedWithTrademark = () => (
+    <span className="relative inline-block">
+       
+      <span className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-800 tracking-tight uppercase">DEPLOYED</span>
+      <span className="absolute -top-0.5 -right-3 md:-right-4 lg:-right-5 w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 rounded-full bg-black flex items-center justify-center">
+        <span className="text-white text-[7px] md:text-[8px] lg:text-[9px] font-bold leading-none">®</span>
+      </span>
+    </span>
+  );
+
+  const carouselItems = [
+    <DeployedWithTrademark key="deployed-1" />,
+    <DeployedWithTrademark key="deployed-2" />,
+    <DeployedWithTrademark key="deployed-3" />,
+  ];
+
   return (
-    <footer className="bg-gray-900 text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* About Section */}
+    <footer className="w-full bg-[#f5f5f0] text-gray-800">
+      {/* Auto-scrolling Carousel */}
+      <div className="w-full bg-[#f5f5f0] py-8 md:py-10 border-b border-gray-200">
+        <AutoCarousel 
+          items={carouselItems} 
+          speed={40}
+          className="h-16 md:h-20 flex items-center"
+        />
+      </div>
+      <div className="max-w-7xl mx-auto px-8 py-12 md:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-6 lg:gap-8">
           <div>
-            <h3 className="text-white text-lg font-semibold mb-4">About StyleTrending</h3>
-            <p className="text-sm mb-4">
-              Your one-stop destination for fashion, watches, and accessories. Shop the latest trends with the best prices.
+            <h3 className="text-sm font-bold uppercase mb-4 tracking-wide text-gray-800">SHOP BY CATEGORY</h3>
+            <ul className="space-y-2">
+              <li><a href="/collections/t-shirt" className="text-sm text-gray-700 hover:text-gray-900 block">T-Shirt</a></li>
+              <li><a href="/collections/polos" className="text-sm text-gray-700 hover:text-gray-900 block">Polos</a></li>
+              <li><a href="/collections/full-sleeves" className="text-sm text-gray-700 hover:text-gray-900 block">Full Sleeves</a></li>
+              <li><a href="/collections/cargo-shirts" className="text-sm text-gray-700 hover:text-gray-900 block">Cargo Shirts</a></li>
+              <li><a href="/collections/oversized" className="text-sm text-gray-700 hover:text-gray-900 block">Oversized</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold uppercase mb-4 tracking-wide text-gray-800">SHOP BY COLLECTIONS</h3>
+            <ul className="space-y-2">
+              <li><a href="/collections/military" className="text-sm text-gray-700 hover:text-gray-900 block">Military</a></li>
+              <li><a href="/collections/adventure" className="text-sm text-gray-700 hover:text-gray-900 block">Adventure</a></li>
+              <li><a href="/collections/patriot" className="text-sm text-gray-700 hover:text-gray-900 block">Patriot</a></li>
+              <li><a href="/collections/champions" className="text-sm text-gray-700 hover:text-gray-900 block">Champions</a></li>
+              <li><a href="/collections/men-at-work" className="text-sm text-gray-700 hover:text-gray-900 block">Men At Work</a></li>
+              <li><a href="/collections/transport" className="text-sm text-gray-700 hover:text-gray-900 block">Transport</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold uppercase mb-4 tracking-wide text-gray-800">POLICIES</h3>
+            <ul className="space-y-2">
+              <li><a href="/policies/privacy-policy" className="text-sm text-gray-700 hover:text-gray-900 block">Privacy Policy</a></li>
+              <li><a href="/policies/return-and-exchange-policy" className="text-sm text-gray-700 hover:text-gray-900 block">Return and Exchange Policy</a></li>
+              <li><a href="/policies/shipping-policy" className="text-sm text-gray-700 hover:text-gray-900 block">Shipping Policy</a></li>
+              <li><a href="/policies/terms-of-service" className="text-sm text-gray-700 hover:text-gray-900 block">Terms of Service</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold uppercase mb-4 tracking-wide text-gray-800">NEWSLETTER</h3>
+            <p className="text-sm text-gray-700 mb-4">
+              Sign up to our newsletter to receive exclusive offers.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                </svg>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </a>
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-white text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/men" className="hover:text-white transition">Men's Fashion</Link>
-              </li>
-              <li>
-                <Link to="/women" className="hover:text-white transition">Women's Fashion</Link>
-              </li>
-              <li>
-                <Link to="/watches" className="hover:text-white transition">Watches</Link>
-              </li>
-              <li>
-                <Link to="/lenses" className="hover:text-white transition">Lenses & Spectacles</Link>
-              </li>
-              <li>
-                <Link to="/cart" className="hover:text-white transition">Shopping Cart</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Customer Service */}
-          <div>
-            <h3 className="text-white text-lg font-semibold mb-4">Customer Service</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/contact" className="hover:text-white transition">Contact Us</Link>
-              </li>
-              <li>
-                <Link to="/faq" className="hover:text-white transition">FAQ</Link>
-              </li>
-              <li>
-                <Link to="/shipping" className="hover:text-white transition">Shipping Info</Link>
-              </li>
-              <li>
-                <Link to="/returns" className="hover:text-white transition">Returns</Link>
-              </li>
-              <li>
-                <Link to="/track-order" className="hover:text-white transition">Track Order</Link>
-              </li>
-              <li>
-                <Link to="/size-guide" className="hover:text-white transition">Size Guide</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-white text-lg font-semibold mb-4">Contact Us</h3>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-start">
-                <svg className="w-5 h-5 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <span>support@styletrending.com</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <span>+91 1800-123-4567</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>123 Shopping Street,<br />Mumbai, India 400001</span>
-              </li>
-            </ul>
+            <form onSubmit={handleSubscribe} className="mb-3">
+              <div className="flex w-full">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="E-mail"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-l text-xs bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-400"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-gray-800 text-white uppercase text-xs font-semibold rounded-r hover:bg-gray-900 whitespace-nowrap"
+                >
+                  SUBSCRIBE
+                </button>
+              </div>
+            </form>
+            <p className="text-xs text-gray-600">
+              By signing up to our newsletter, you agree with our privacy policy.
+            </p>
           </div>
         </div>
-
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-800 mt-8 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-gray-400 mb-4 md:mb-0">
-              © 2024 StyleTrending. All rights reserved.
-            </p>
-            <div className="flex space-x-6 text-sm">
-              <Link to="/privacy-policy" className="text-gray-400 hover:text-white transition">Privacy Policy</Link>
-              <Link to="/terms-of-service" className="text-gray-400 hover:text-white transition">Terms of Service</Link>
-              <Link to="/cookie-policy" className="text-gray-400 hover:text-white transition">Cookie Policy</Link>
+      </div>
+      <div className="border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-8 py-14 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
+            <div>
+              <h3 className="text-sm font-bold uppercase mb-6 tracking-wider text-gray-900">CONTACT US</h3>
+              <div className="space-y-3 text-sm text-gray-600">
+                <p>
+                  <a href="/track-order" className="underline hover:text-gray-900 transition-colors duration-200 font-medium">
+                    Track your Order - Click Here
+                  </a>
+                </p>
+                <p className="text-gray-700">The Accesories</p>
+                <p>
+                  <span className="font-semibold text-gray-800">Email</span> - <a href="mailto:support@deployed.store" className="hover:text-gray-900 transition-colors">support@deployed.store</a>
+                </p>
+                <p>
+                  <span className="font-semibold text-gray-800">Phone No.</span> - <a href="tel:+918047360314" className="hover:text-gray-900 transition-colors">+91 80 4736 0314</a>
+                </p>
+                <p className="text-xs text-gray-500">( Mon - Fri 11 AM - 6 PM )</p>
+                <p className="text-xs text-gray-500">( Sat - 11 AM - 5 PM )</p>
+                <div className="mt-5">
+                  <div className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-white border border-gray-300 rounded-md cursor-pointer hover:border-gray-400 hover:shadow-sm transition-all duration-200">
+                    <span className="text-xl">🇮🇳</span>
+                    <span className="text-sm font-semibold text-gray-800">INR</span>
+                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="mt-5 text-gray-700">50 B C Road, Kolkata - 700050</p>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold uppercase mb-6 tracking-wider text-gray-900">ABOUT US</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                At Deployed, we celebrate passions that demand courage and resilience. From aviation to military, 
+                expeditions to wildlife, and the high seas to the open roads, our brand is built for those who live boldly.
+              </p>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="border-t border-gray-200 bg-[#f5f5f0]">
+        <div className="max-w-7xl mx-auto px-8 py-6 md:px-6">
+          <p className="text-xs text-gray-500 text-center">
+            © 2026 - Deployed Copyrighted and Owned by - Squawk Supply Core Pvt Ltd
+          </p>
         </div>
       </div>
     </footer>
@@ -123,4 +152,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
