@@ -92,6 +92,7 @@ function Homepage() {
 
   // Hero Section
   const CAROUSEL_IMAGES = [
+    'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767866234/Frame_1000013225_4fc9b842-35e6-4924-a31c-896e64975306_l508np.png',
     'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767796313/HomepageBannerDesktop1_adb64c08-9dd6-4c32-9bff-31ba0fbc2479_x0hn9c.webp',
     'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767796315/HomepageBannerDesktop1_4221d191-c68f-44b7-875b-bce6d84375a9_iy5qee.webp',
     'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767796318/Frame_427321171_c05550a7-b126-43f5-9b7e-9791f0ade122_jewwmf.webp'
@@ -137,6 +138,8 @@ function Homepage() {
   const zipperHoodiesScrollRef = useRef(null);
   const hoodiesScrollRef = useRef(null);
   const sweatshirtsScrollRef = useRef(null);
+  const firstRowProductsScrollRef = useRef(null);
+  const secondRowProductsScrollRef = useRef(null);
 
   // Scroll functions
   const scrollLeft = (ref) => {
@@ -151,12 +154,34 @@ function Homepage() {
     }
   };
 
+  // Calculate scroll progress
+  const calculateScrollProgress = (ref, key) => {
+    if (ref.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = ref.current;
+      const maxScroll = scrollWidth - clientWidth;
+      const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
+      setScrollProgress(prev => ({ ...prev, [key]: progress }));
+    }
+  };
+
+  // Handle scroll with progress tracking
+  const handleScroll = (ref, key) => {
+    calculateScrollProgress(ref, key);
+  };
+
   // Category section state
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 3;
+
+  // Scroll progress state for carousel indicators
+  const [scrollProgress, setScrollProgress] = useState({
+    zipperHoodies: 0,
+    hoodies: 0,
+    sweatshirts: 0,
+    firstRowProducts: 0,
+    secondRowProducts: 0
+  });
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -186,6 +211,23 @@ function Homepage() {
       }
     };
     fetchCategories();
+  }, []);
+
+  // Initialize scroll progress on mount
+  useEffect(() => {
+    const refs = [
+      { ref: zipperHoodiesScrollRef, key: 'zipperHoodies' },
+      { ref: hoodiesScrollRef, key: 'hoodies' },
+      { ref: sweatshirtsScrollRef, key: 'sweatshirts' },
+      { ref: firstRowProductsScrollRef, key: 'firstRowProducts' },
+      { ref: secondRowProductsScrollRef, key: 'secondRowProducts' }
+    ];
+
+    refs.forEach(({ ref, key }) => {
+      if (ref.current) {
+        calculateScrollProgress(ref, key);
+      }
+    });
   }, []);
 
   // Footer state
@@ -271,6 +313,7 @@ function Homepage() {
             </button>
             <div 
               ref={zipperHoodiesScrollRef}
+              onScroll={() => handleScroll(zipperHoodiesScrollRef, 'zipperHoodies')}
               className="overflow-x-auto scrollbar-hide flex gap-6 pb-4 scroll-smooth"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
@@ -320,6 +363,18 @@ function Homepage() {
               </svg>
             </button>
           </div>
+          {/* Progress Bar */}
+          <div className="flex justify-center mt-6">
+            <div className="relative w-64 h-0.5 bg-gray-300">
+              <div 
+                className="absolute top-0 h-full bg-black transition-all duration-300"
+                style={{ 
+                  width: '20%',
+                  left: `${scrollProgress.zipperHoodies * 0.8}%`
+                }}
+              ></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -346,6 +401,7 @@ function Homepage() {
             </button>
             <div 
               ref={hoodiesScrollRef}
+              onScroll={() => handleScroll(hoodiesScrollRef, 'hoodies')}
               className="overflow-x-auto scrollbar-hide flex gap-6 pb-4 scroll-smooth"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
@@ -407,6 +463,18 @@ function Homepage() {
               </svg>
             </button>
           </div>
+          {/* Progress Bar */}
+          <div className="flex justify-center mt-6">
+            <div className="relative w-64 h-0.5 bg-gray-300">
+              <div 
+                className="absolute top-0 h-full bg-black transition-all duration-300"
+                style={{ 
+                  width: '20%',
+                  left: `${scrollProgress.hoodies * 0.8}%`
+                }}
+              ></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -433,6 +501,7 @@ function Homepage() {
             </button>
             <div 
               ref={sweatshirtsScrollRef}
+              onScroll={() => handleScroll(sweatshirtsScrollRef, 'sweatshirts')}
               className="overflow-x-auto scrollbar-hide flex gap-6 pb-4 scroll-smooth"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
@@ -482,6 +551,18 @@ function Homepage() {
               </svg>
             </button>
           </div>
+          {/* Progress Bar */}
+          <div className="flex justify-center mt-6">
+            <div className="relative w-64 h-0.5 bg-gray-300">
+              <div 
+                className="absolute top-0 h-full bg-black transition-all duration-300"
+                style={{ 
+                  width: '20%',
+                  left: `${scrollProgress.sweatshirts * 0.8}%`
+                }}
+              ></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -527,44 +608,81 @@ function Homepage() {
       <section className="w-full bg-white">
         <div className="w-full py-16 px-8 md:py-12 md:px-6">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {firstRowProducts.map((product) => (
-                <div key={product.id} className="group relative bg-white">
-                  {product.colors.length > 0 && (
-                    <div className="absolute top-2 left-2 flex gap-2 z-10">
-                      {product.colors.map((color, idx) => (
-                        <div
-                          key={idx}
-                          className={`w-6 h-6 rounded-full border-2 ${getColorClass(color)} shadow-md`}
-                        ></div>
-                      ))}
+            <div className="relative overflow-x-hidden">
+              <button
+                onClick={() => scrollLeft(firstRowProductsScrollRef)}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+                aria-label="Previous product"
+              >
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div 
+                ref={firstRowProductsScrollRef}
+                onScroll={() => handleScroll(firstRowProductsScrollRef, 'firstRowProducts')}
+                className="overflow-x-auto scrollbar-hide flex gap-6 pb-4 scroll-smooth"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {firstRowProducts.map((product) => (
+                  <div key={product.id} className="flex-shrink-0 w-64 md:w-72 group relative bg-white">
+                    {product.colors.length > 0 && (
+                      <div className="absolute top-2 left-2 flex gap-2 z-10">
+                        {product.colors.map((color, idx) => (
+                          <div
+                            key={idx}
+                            className={`w-6 h-6 rounded-full border-2 ${getColorClass(color)} shadow-md`}
+                          ></div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="relative mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-[3/4]">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <button className="absolute bottom-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-100">
+                        <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </button>
                     </div>
-                  )}
-                  <div className="relative mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-[3/4]">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <button className="absolute bottom-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-100">
-                      <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-gray-900">{product.price}</span>
-                      {product.originalPrice && (
-                        <span className="text-xs text-gray-500 line-through">{product.originalPrice}</span>
-                      )}
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-semibold text-gray-900">{product.price}</span>
+                        {product.originalPrice && (
+                          <span className="text-xs text-gray-500 line-through">{product.originalPrice}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <button
+                onClick={() => scrollRight(firstRowProductsScrollRef)}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+                aria-label="Next product"
+              >
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+            {/* Progress Bar */}
+            <div className="flex justify-center mt-6">
+              <div className="relative w-64 h-0.5 bg-gray-300">
+                <div 
+                  className="absolute top-0 h-full bg-black transition-all duration-300"
+                  style={{ 
+                    width: '20%',
+                    left: `${scrollProgress.firstRowProducts * 0.8}%`
+                  }}
+                ></div>
+              </div>
             </div>
           </div>
         </div>
@@ -594,87 +712,126 @@ function Homepage() {
 
         <div className="w-full py-16 px-8 md:py-12 md:px-6">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {secondRowProducts.map((product) => (
-                <div key={product.id} className="group relative bg-white">
-                  {product.colors.length > 0 && (
-                    <div className="absolute top-2 left-2 flex gap-2 z-10">
-                      {product.colors.map((color, idx) => (
-                        <div
-                          key={idx}
-                          className={`w-6 h-6 rounded-full border-2 ${getColorClass(color)} shadow-md`}
-                        ></div>
-                      ))}
-                    </div>
-                  )}
-                  <div className="relative mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-[3/4]">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <button className="absolute bottom-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-100">
-                      <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-gray-900">{product.price}</span>
-                      {product.originalPrice && (
-                        <span className="text-xs text-gray-500 line-through">{product.originalPrice}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center justify-center gap-2">
+            <div className="relative overflow-x-hidden">
               <button
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                aria-label="Previous page"
+                onClick={() => scrollLeft(secondRowProductsScrollRef)}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+                aria-label="Previous product"
               >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              {[...Array(totalPages)].map((_, index) => {
-                const page = index + 1;
-                return (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                      currentPage === page
-                        ? 'bg-gray-900 text-white'
-                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'
-                    }`}
-                    aria-label={`Go to page ${page}`}
-                  >
-                    {page}
-                  </button>
-                );
-              })}
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                aria-label="Next page"
+              <div 
+                ref={secondRowProductsScrollRef}
+                onScroll={() => handleScroll(secondRowProductsScrollRef, 'secondRowProducts')}
+                className="overflow-x-auto scrollbar-hide flex gap-6 pb-4 scroll-smooth"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {secondRowProducts.map((product) => (
+                  <div key={product.id} className="flex-shrink-0 w-64 md:w-72 group relative bg-white">
+                    {product.colors.length > 0 && (
+                      <div className="absolute top-2 left-2 flex gap-2 z-10">
+                        {product.colors.map((color, idx) => (
+                          <div
+                            key={idx}
+                            className={`w-6 h-6 rounded-full border-2 ${getColorClass(color)} shadow-md`}
+                          ></div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="relative mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-[3/4]">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <button className="absolute bottom-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-100">
+                        <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </button>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-semibold text-gray-900">{product.price}</span>
+                        {product.originalPrice && (
+                          <span className="text-xs text-gray-500 line-through">{product.originalPrice}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => scrollRight(secondRowProductsScrollRef)}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+                aria-label="Next product"
+              >
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
             </div>
+            {/* Progress Bar */}
+            <div className="flex justify-center mt-6">
+              <div className="relative w-64 h-0.5 bg-gray-300">
+                <div 
+                  className="absolute top-0 h-full bg-black transition-all duration-300"
+                  style={{ 
+                    width: '20%',
+                    left: `${scrollProgress.secondRowProducts * 0.8}%`
+                  }}
+                ></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Patriot Collection Banner Section */}
+      <div className="w-full bg-white">
+        <div className="relative w-full h-[70vh] md:h-[75vh] overflow-hidden">
+          <img
+            src="https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767866521/Frame_427321221_d06213ca-8773-4542-b58e-385c20291c73_plaiap.jpg"
+            alt="Patriot Collection"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-32 right-8 md:right-6 md:top-24 text-right">
+            <p className="text-base md:text-sm lg:text-lg text-white uppercase tracking-wide leading-relaxed max-w-sm ml-auto drop-shadow-md mb-4">
+              UNIFORMED IN SPIRIT.
+              <br />
+              UNFILTERED IN PRIDE.
+            </p>
+          </div>
+          <div className="absolute top-1/2 -translate-y-1/2 right-8 md:right-6 text-right">
+            <h2 className="text-7xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tight leading-tight drop-shadow-lg mb-2">
+              PATRIOT
+            </h2>
+            <h2 className="text-7xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tight leading-tight drop-shadow-lg">
+              COLLECTION
+            </h2>
+          </div>
+          <div className="absolute bottom-20 right-8 md:right-6 md:bottom-16">
+            <button className="px-6 py-3 border-2 border-white text-white font-normal uppercase tracking-wide text-sm hover:bg-white hover:text-black transition-all duration-300 drop-shadow-md">
+              THE INDIA COLLECTION
+            </button>
+          </div>
+        </div>
+        <div className="w-full bg-white !h-52 py-8 px-8 md:px-6">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
+            <div className="flex items-center gap-4 mb-4 md:mb-0">
+               
+            </div>
+            <p className="text-base md:text-lg text-gray-800 !text-center leading-relaxed flex-1">
+              India Collection by Deployed, speaks to those who carry their Indianness not in loud symbols, but in silent conviction. To wear not just a design, but an identity of heritage, pride and responsibility.
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Category Section */}
       <div className="bg-white py-16">
