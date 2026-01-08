@@ -1,644 +1,848 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-// import Footer from '../components/Footer'; 
-import ProductCard from '../components/ProductCard';
-import { productAPI } from '../utils/api';
-import { handleImageError } from '../utils/imageFallback';
 
-// --- ICONS (Embedded directly so no install needed) ---
-const IconChevronLeft = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>;
-const IconChevronRight = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>;
-const IconClose = () => <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>;
+function Homepage() {
+  // Carousel component for Hero Section
+  const Carousel = ({ images = [] }) => {
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const slideRefs = useRef([]);
 
-// --- API FETCH FUNCTIONS (Kept from previous version) ---
-const fetchFreshDrops = async () => {
-  try {
-    const [menShoes, womenShoes, accessories, watches, lenses, mensLenses] = await Promise.all([
-      productAPI.getMenItems({ limit: 10, category: 'shoes' }),
-      productAPI.getWomenItems({ limit: 10, category: 'shoes' }),
-      productAPI.getAccessories({ limit: 10 }),
-      productAPI.getWatches({ limit: 10 }),
-      productAPI.getLenses({ limit: 10 }),
-      productAPI.getLenses({ limit: 10, gender: 'men' })
-    ]);
-    
-    // Combine shoes from men and women, take exactly 12
-    let allShoes = [];
-    if (menShoes.success && menShoes.data.products) {
-      allShoes = [...allShoes, ...menShoes.data.products];
+    useEffect(() => {
+      if (images.length === 0) return;
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % images.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }, [images.length]);
+
+    const goToPrevious = () => {
+      setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
+    };
+
+    const goToNext = () => {
+      setCurrentSlide((prev) => (prev + 1) % images.length);
+    };
+
+    const goToSlide = (index) => {
+      setCurrentSlide(index);
+    };
+
+    if (images.length === 0) {
+      return (
+        <div className="relative w-full bg-black flex items-center justify-center text-white text-base py-20">
+          No images available
+        </div>
+      );
     }
-    if (womenShoes.success && womenShoes.data.products) {
-      allShoes = [...allShoes, ...womenShoes.data.products];
-    }
-    const shoes = allShoes.slice(0, 12);
-    
-    // Get exactly 10 accessories
-    const acc = accessories.success && accessories.data.products 
-      ? accessories.data.products.slice(0, 10) 
-      : [];
-    
-    // Get exactly 10 watches
-    const watch = watches.success && watches.data.products 
-      ? watches.data.products.slice(0, 10) 
-      : [];
-    
-    // Get exactly 10 lenses
-    const lens = lenses.success && lenses.data.products 
-      ? lenses.data.products.slice(0, 10) 
-      : [];
-    
-    // Get exactly 10 men's lenses
-    const mensLens = mensLenses.success && mensLenses.data.products 
-      ? mensLenses.data.products.slice(0, 10) 
-      : [];
-    
-    // Combine all: 12 shoes + 10 accessories + 10 watches + 10 lenses + 10 men's lenses = 52 products total
-    return [...shoes, ...acc, ...watch, ...lens, ...mensLens];
-  } catch (error) {
-    console.error("Error fetching fresh drops:", error);
-    return [];
-  }
-};
 
-const fetchSaleItems = async () => {
-  const res = await productAPI.getAllProducts({ limit: 4, onSale: true, sort: 'discountPercent', order: 'desc' });
-  return res.success ? res.data.products : [];
-};
+    return (
+      <div className="relative w-full h-full bg-black flex items-center justify-center">
+        {images.map((image, index) => (
+          <div 
+            key={index} 
+            ref={el => slideRefs.current[index] = el}
+            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
+              index === currentSlide ? 'opacity-100 z-0' : 'opacity-0 z-[-1]'
+            }`}
+          >
+            <img 
+              src={image} 
+              alt={`Slide ${index + 1}`}
+              className="w-full h-full object-cover"
+              loading={index === 0 ? 'eager' : 'lazy'}
+            />
+          </div>
+        ))}
 
-const fetchMen = async () => {
-  const res = await productAPI.getMenItems({ limit: 4 });
-  return res.success ? res.data.products : [];
-};
+        <button 
+          className="absolute top-1/2 -translate-y-1/2 left-8 bg-white/15 border border-white/20 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 backdrop-blur-md text-white hover:bg-white/30 hover:border-white/40 hover:scale-110 active:scale-95 lg:w-10 lg:h-10 md:left-4 md:w-9 md:h-9"
+          onClick={goToPrevious}
+          aria-label="Previous slide"
+        >
+          <svg className="w-6 h-6 lg:w-5 lg:h-5 md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button 
+          className="absolute top-1/2 -translate-y-1/2 right-8 bg-white/15 border border-white/20 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 backdrop-blur-md text-white hover:bg-white/30 hover:border-white/40 hover:scale-110 active:scale-95 lg:w-10 lg:h-10 md:right-4 md:w-9 md:h-9"
+          onClick={goToNext}
+          aria-label="Next slide"
+        >
+          <svg className="w-6 h-6 lg:w-5 lg:h-5 md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
 
-const fetchWomen = async () => {
-  const res = await productAPI.getWomenItems({ limit: 4 });
-  return res.success ? res.data.products : [];
-};
-
-const fetchWatches = async () => {
-  const res = await productAPI.getWatches({ limit: 4 });
-  return res.success ? res.data.products : [];
-};
-
-const fetchAccessories = async () => {
-  try {
-    const [lenses, acc] = await Promise.all([
-      productAPI.getLenses({ limit: 2 }),
-      productAPI.getAccessories({ limit: 2 })
-    ]);
-    let combined = [];
-    if (lenses.success) combined = [...combined, ...lenses.data.products];
-    if (acc.success) combined = [...combined, ...acc.data.products];
-    return combined.slice(0, 4);
-  } catch (error) {
-    console.error("Error fetching accessories:", error);
-    return [];
-  }
-};  
-
-const LuxeSection = () => {
-  const scrollRef = useRef(null);
-
-  // Sample data to match the image aesthetics
-  const luxeProducts = [
-    {
-      id: 1,
-      brand: "CLINIQUE",
-      image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=800&auto=format&fit=crop",
-      link: "/luxe/clinique"
-    },
-    {
-      id: 2,
-      brand: "RABANNE",
-      image: "https://images.unsplash.com/photo-1594035910387-fea4779426e9?q=80&w=800&auto=format&fit=crop",
-      link: "/luxe/rabanne"
-    },
-    {
-      id: 3,
-      brand: "ISSEY MIYAKE",
-      image: "https://images.unsplash.com/photo-1585232561025-aa543d3122c4?q=80&w=800&auto=format&fit=crop",
-      link: "/luxe/issey"
-    },
-    {
-      id: 4,
-      brand: "VERSACE",
-      image: "https://images.unsplash.com/photo-1587017539504-67cfbddac569?q=80&w=800&auto=format&fit=crop",
-      link: "/luxe/versace"
-    },
-  ];
-}
-
-const scroll = (direction) => {
-  if (scrollRef.current) {
-    const { current } = scrollRef;
-    const scrollAmount = 300; // Adjust scroll distance
-    if (direction === 'left') {
-      current.scrollLeft -= scrollAmount;
-    } else {
-      current.scrollLeft += scrollAmount;
-    }
-  }
-};
-
-
-
-// --- NEWS TICKER COMPONENT (New) ---
-const NewsTicker = () => {
-  const marqueeContent = "⚡ FREE SHIPPING ON ALL ORDERS OVER ₹1,000 ⚡ | ✨ NEW SEASON STYLES ADDED DAILY ✨ | 🎁 LIMITED TIME DISCOUNTS ON WATCHES 🎁 | 🛍️ JOIN OUR LOYALTY PROGRAM 🛍️";
-
-  // NOTE: For the 'continuous' marquee animation, this CSS needs to be applied.
-  // In a real project, place this CSS in your global stylesheet (e.g., index.css).
-  // For a self-contained solution, we use the <style> tag here.
-
-  return (
-    <>
-    
-      <style>
-        {`
-            @keyframes marquee {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(-50%); }
-            }
-            .animate-marquee {
-                animation: marquee 30s linear infinite;
-                background-colour: black;
-            }
-            `}
-      </style>
-      <div className="overflow-hidden bg-black text-white py-3 border-b border-gray-700">
-        <div className="whitespace-nowrap w-[200%] flex animate-marquee">
-          {/* Duplicate content to ensure seamless loop */}
-          <span className="text-sm font-medium tracking-wider mx-8">{marqueeContent}</span>
-          <span className="text-sm font-medium tracking-wider mx-8" aria-hidden="true">{marqueeContent}</span>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20 lg:bottom-6 md:bottom-4 md:gap-2">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              className={`h-3 rounded-full border-2 border-white/50 bg-transparent cursor-pointer transition-all duration-300 p-0 hover:bg-white/30 hover:border-white/80 ${
+                index === currentSlide 
+                  ? 'bg-white border-white w-8 rounded-md md:w-6' 
+                  : 'w-3 md:w-2.5'
+              }`}
+              onClick={() => goToSlide(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
       </div>
-    </>
-  );
-};
+    );
+  };
 
+  // Hero Section
+  const CAROUSEL_IMAGES = [
+    'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767796313/HomepageBannerDesktop1_adb64c08-9dd6-4c32-9bff-31ba0fbc2479_x0hn9c.webp',
+    'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767796315/HomepageBannerDesktop1_4221d191-c68f-44b7-875b-bce6d84375a9_iy5qee.webp',
+    'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767796318/Frame_427321171_c05550a7-b126-43f5-9b7e-9791f0ade122_jewwmf.webp'
+  ];
 
-const Home = () => {
-  // --- UI STATE ---
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [activeStoryIndex, setActiveStoryIndex] = useState(null);
-  const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const categoryScrollRef = useRef(null);
-  const lifestyleScrollRef = useRef(null);
+  // Product data for various sections
+  const zipperHoodiesProducts = [
+    { id: 1, name: "CUSTOM ARMY UNIFORM ZIPPER HOODIE", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", price: "Rs. 2,499.00", originalPrice: "Rs. 3,299.00", colors: ['black'] },
+    { id: 2, name: "Garud SF Custom Uniform Zipper Hoodie", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", price: "Rs. 2,499.00", originalPrice: "Rs. 3,299.00", colors: ['black'] },
+    { id: 3, name: "Para Commando Uniform Zipper Hoodie", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", price: "Rs. 1,750.00", originalPrice: "Rs. 3,299.00", colors: ['black', 'white'] },
+    { id: 4, name: "Jat Regiment Zipper Hoodie", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", price: "Rs. 1,750.00", originalPrice: "Rs. 3,299.00", colors: ['black', 'white'] },
+    { id: 5, name: "IAF MK2 Special Edition Zipper Hoodie", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", price: "Rs. 1,750.00", originalPrice: "Rs. 3,299.00", colors: ['black', 'white'] },
+    { id: 6, name: "Para Sf Zipper Hoodie", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", price: "Rs. 1,750.00", originalPrice: "Rs. 3,299.00", colors: ['black', 'white'] }
+  ];
 
-  // --- DATA STATE & FETCHING (Unchanged) ---
-  const [freshDrops, setFreshDrops] = useState([]);
-  const [saleItems, setSaleItems] = useState([]);
-  const [menItems, setMenItems] = useState([]);
-  const [womenItems, setWomenItems] = useState([]);
-  const [watches, setWatches] = useState([]);
-  const [accessories, setAccessories] = useState([]);
+  const hoodies = [
+    { id: 1, name: "MARCOS AGENT HOODIE", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", colors: ['black'], url: "https://www.deployed.store/products/marcos-agent-hoodie" },
+    { id: 2, name: "ARMY SERVICE HOODIE", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", colors: ['black'], text: "ARMY", subtitle: "SERVICE BEFORE SELF", year: "EST. 1999" },
+    { id: 3, name: "GARUD COMMANDOS HOODIE", frontImage: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", backImage: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", colors: ['black', 'white'], text: "GARUD", subtitle: "SPECIAL FORCES" },
+    { id: 4, name: "DEPLOYED HOODIE", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", colors: ['black'], text: "DEPLOYED" },
+    { id: 5, name: "ELITE FORCES HOODIE", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", colors: ['black', 'white'], text: "GH", subtitle: "775/3", tagline: "READY FOR EXTREMES" }
+  ];
+
+  const sweatshirts = [
+    { id: 1, name: "TIGER HEAD SWEATSHIRT", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", colors: ['black'], design: "Tiger head on back with DEPLOYED® branding" },
+    { id: 2, name: "ROARING TIGER SWEATSHIRT", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", colors: ['black'], design: "Roaring tiger graphic on front, DEPLOYED on sleeve" },
+    { id: 3, name: "GARUD COMMANDOS SWEATSHIRT", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", colors: ['white', 'black', 'white'], design: "Olive green with eagle emblem and GARUD COMMANDOS text" },
+    { id: 4, name: "GHATAK SWEATSHIRT", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop", colors: ['white', 'white', 'black'], design: "Khaki/tan with skull design and GHATAK branding" }
+  ];
+
+  const products = [
+    { id: 1, name: "PUNJAB REGIMENT Signature LuxeSoft Cotton T-Shirt", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop", price: "From Rs. 799.00", originalPrice: "Rs. 999.00", colors: [] },
+    { id: 2, name: "Sqdn 30 Deployed Signature LuxeSoft Cotton T-Shirt", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop", price: "From Rs. 799.00", originalPrice: "Rs. 999.00", colors: [] },
+    { id: 3, name: "Navy Admiral Polo T-Shirt", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop", price: "Rs. 1,799.00", originalPrice: "Rs. 2,499.00", colors: [] },
+    { id: 4, name: "45 Armoured Corps Signature LuxeSoft Cotton T-Shirt", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop", price: "From Rs. 799.00", originalPrice: "Rs. 999.00", colors: [] },
+    { id: 5, name: "Army Legacy Signature LuxeSoft Cotton T-Shirt", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop", price: "From Rs. 799.00", originalPrice: "Rs. 999.00", colors: ['black', 'olive'] },
+    { id: 6, name: "Army 71 Heritage Polo T-Shirt", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop", price: "Rs. 1,799.00", originalPrice: "Rs. 2,499.00", colors: ['black', 'white'] },
+    { id: 7, name: "Navy Guardians Of The Bay Signature LuxeSoft Cotton T-Shirt", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop", price: "From Rs. 799.00", originalPrice: "Rs. 999.00", colors: ['white'] },
+    { id: 8, name: "Covert Ops X Signature LuxeSoft Cotton T-Shirt", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop", price: "From Rs. 799.00", originalPrice: "Rs. 999.00", colors: ['black', 'blue'] }
+  ];
+
+  // Refs for scrollable sections
+  const zipperHoodiesScrollRef = useRef(null);
+  const hoodiesScrollRef = useRef(null);
+  const sweatshirtsScrollRef = useRef(null);
+
+  // Scroll functions
+  const scrollLeft = (ref) => {
+    if (ref.current) {
+      ref.current.scrollBy({ left: -400, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = (ref) => {
+    if (ref.current) {
+      ref.current.scrollBy({ left: 400, behavior: 'smooth' });
+    }
+  };
+
+  // Category section state
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = 3;
 
   useEffect(() => {
-    const loadAllData = async () => {
-      setIsLoading(true);
+    const fetchCategories = async () => {
       try {
-        const [freshDropsData, saleData, menData, womenData, watchesData, accessoriesData] = await Promise.all([
-          fetchFreshDrops(), fetchSaleItems(), fetchMen(), fetchWomen(), fetchWatches(), fetchAccessories()
+        setLoading(true);
+        const response = await fetch('http://localhost:5000/api/categories');
+        if (!response.ok) throw new Error('Failed to fetch categories');
+        const data = await response.json();
+        setCategories(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setError(err.message);
+        setCategories([
+          { name: 'T-Shirt', slug: 't-shirt' },
+          { name: 'Full Sleeve T-Shirt', slug: 'full-sleeve-t-shirt' },
+          { name: 'Polo', slug: 'polo' },
+          { name: 'Oversized', slug: 'oversized' },
+          { name: 'Cargo Shirt', slug: 'cargo-shirt' },
+          { name: 'Sweatshirt', slug: 'sweatshirt' },
+          { name: 'Hoodies', slug: 'hoodies' },
+          { name: 'Zipper Hoodies', slug: 'zipper-hoodies' },
+          { name: 'Jacket', slug: 'jacket' }
         ]);
-        setFreshDrops(freshDropsData);
-        setSaleItems(saleData);
-        setMenItems(menData);
-        setWomenItems(womenData);
-        setWatches(watchesData);
-        setAccessories(accessoriesData);
-      } catch (error) {
-        console.error("Error loading home page data:", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
-    loadAllData();
+    fetchCategories();
   }, []);
 
+  // Footer state
+  const [email, setEmail] = useState('');
 
-  const stories = [
-    { hashtag: 'Xmas', emoji: '🎄', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764741928/IMG_20251123_161820_skzchs.png' },
-    { hashtag: 'Desi', emoji: '😎', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764741995/image-104_iuyyuw.png' },
-    { hashtag: 'Street', emoji: '🔥', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742092/ZfLAMkmNsf2sHkoW_DELHI-FACES-1_fjnvcb.avif' },
-    { hashtag: 'FitCheck', emoji: '✨', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742199/0d37737c8c2c7536422e411fb68eeeb3_ylhf3n.jpg' },
-    { hashtag: 'Tees', emoji: '👕', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742259/0424-TSHIRT-06_1_7c30d8ed-155d-47a6-a52f-52858221a302_fjdfpo.webp', link: '/mens' },
-    { hashtag: 'Denim', emoji: '👖', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742467/GettyImages-2175843730_q21gse.jpg' },
-    { hashtag: 'Scarf', emoji: '🧣', image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1764742548/NECK_20SCARF_20TREND_20190625_20GettyImages-1490484490_ccdwdy.webp' }
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    console.log('Subscribing:', email);
+    setEmail('');
+  };
+
+  // Helper functions
+  const getColorClass = (color) => {
+    const colorMap = {
+      'black': 'bg-black border-white',
+      'white': 'bg-white border-gray-300',
+      'olive': 'bg-[#556B2F] border-gray-300',
+      'blue': 'bg-blue-600 border-gray-300'
+    };
+    return colorMap[color] || 'bg-gray-400 border-gray-300';
+  };
+
+  const collections = [
+    { name: 'Military', slug: 'military' },
+    { name: 'Adventure', slug: 'adventure' },
+    { name: 'Patriot', slug: 'patriot' },
+    { name: 'Champions', slug: 'champions' },
+    { name: 'Men At Work', slug: 'men-at-work' },
+    { name: 'Transport', slug: 'transport' }
   ];
 
-  const carouselSlides = [
-    { image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765179209/62987769-6299-4622-965f-168e87ee3572.png', link: '/watches' },
-    { image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765186313/12de4e83-d480-42c3-ad1d-7078f5d19074.png', link: '/men' },
-    { image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765179353/3f1d3d63-ed99-45d8-af35-94c5cdab655c.png', link: '/women' },
-    { image: 'https://cmsimages.shoppersstop.com/main_pb_main_web_e1bd1656a9/main_pb_main_web_e1bd1656a9.png', link: '/sale' }
-  ];
-
-  // --- CAROUSEL LOGIC ---
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [carouselSlides.length]);
-
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
-  const goToSlide = (index) => setCurrentSlide(index);
+  const firstRowProducts = products.slice(0, 4);
+  const secondRowProducts = products.slice(4, 8);
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-800 mt-">
-      
-      {/* --- HERO SECTION (Restored & Top Margin Removed) --- */}
-      <div className="relative w-full bg-gray-50 overflow-hidden group">
-        <div className="hidden lg:block relative w-full">
-          <div className="relative w-full max-w-[2000px] mx-auto aspect-[21/9] md:aspect-[3/1]">
-            {carouselSlides.map((slide, index) => (
-              <Link
-                to={slide.link}
-                key={index}
-                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-              >
-                <img
-                  src={slide.image}
-                  alt="Banner"
-                  className="w-full h-full object-contain object-center"
-                  loading={index === 0 ? "eager" : "lazy"}
-                  onError={(e) => handleImageError(e, 1920, 600)}
-                />
-              </Link>
-            ))}
-          </div>
-          {/* Controls */}
-          <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white/90 text-gray-800 hover:bg-white shadow-lg transition opacity-0 group-hover:opacity-100 transform hover:scale-110">
-            <IconChevronLeft />
-          </button>
-          <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white/90 text-gray-800 hover:bg-white shadow-lg transition opacity-0 group-hover:opacity-100 transform hover:scale-110">
-            <IconChevronRight />
-          </button>
-          {/* Indicators */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-            {carouselSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`h-1.5 rounded-full transition-all duration-300 shadow-sm ${index === currentSlide ? 'w-8 bg-gray-800' : 'w-2 bg-gray-400 hover:bg-gray-600'}`}
-              />
-            ))}
-          </div>
+    <div className="min-h-screen bg-white overflow-x-hidden w-full">
+      {/* Hero Section */}
+      <div className="w-full h-screen bg-black relative overflow-hidden">
+        <Carousel images={CAROUSEL_IMAGES} />
+      </div>
+
+      {/* Wear Your Valour Section */}
+      <div className="w-full bg-white">
+        <div className="bg-white py-20 px-8 text-center max-w-6xl mx-auto md:py-16 md:px-6">
+          <h2 className="text-6xl font-black text-black mb-8 tracking-tight uppercase md:text-4xl md:mb-6">
+            WEAR YOUR VALOUR
+          </h2>
+          <p className="text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto font-normal md:text-lg">
+            We celebrate passions that demand courage and resilience. From aviation to military, 
+            expeditions to wildlife, and the high seas to the open roads—our brand is built for 
+            those who live boldly.
+          </p>
         </div>
-        {/* Mobile Banner */}
-        <div className="block lg:hidden w-full">
-          <Link to="/sale">
-            <img src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1765137539/Black_Elegant_Watch_Special_Offer_Instagram_Post_1_xjcbva.svg" alt="Mobile Banner" className="w-full h-auto object-contain block" loading="eager" />
-          </Link>
+        <div className="relative w-full">
+          <img 
+            src="https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767856091/Frame_1000012467_vy931w.png" 
+            alt="Winter X DPLYD - High-Altitude Tactical Series" 
+            className="w-full h-auto object-cover"
+          />
         </div>
       </div>
 
-      {/* --- NEWS TICKER SECTION (New Continuous Marquee) --- */}
-      <NewsTicker />
-
-      {/* --- STORIES SECTION (Attractive Gradient Rings) --- */}
-      <div className="py-8 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h3 className="text-xl font-bold uppercase tracking-widest text-gray-500 mb-5">Stories By StyleTrending</h3>
-          <div className="flex justify-start md:justify-center gap-6 overflow-x-auto scrollbar-hide pb-2 px-2">
-            {stories.map((item, index) => (
-              <div
-                key={index}
-                className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group"
-                onClick={() => { setActiveStoryIndex(index); setIsStoryViewerOpen(true); }}
-              >
-                <div className="relative p-[0px] rounded-full bg-gradient-to-tr bg-black transition-transform duration-300">
-                  <div className="p-0.5 bg-black rounded-full">
-                    <img src={item.image} alt={item.hashtag} className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-white" />
+      {/* Zipper Hoodies Section */}
+      <section className="w-full bg-white py-16 px-8 md:py-12 md:px-6 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center justify-center mb-12">
+            <h2 className="text-5xl font-light text-black tracking-tight md:text-4xl mb-6">
+              ZIPPER HOODIES
+            </h2>
+            <button className="px-6 py-2 border border-black text-black font-normal uppercase tracking-wide text-sm hover:bg-black hover:text-white transition-all duration-300">
+              VIEW ALL
+            </button>
+          </div>
+          <div className="relative overflow-x-hidden">
+            <button
+              onClick={() => scrollLeft(zipperHoodiesScrollRef)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+              aria-label="Previous product"
+            >
+              <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div 
+              ref={zipperHoodiesScrollRef}
+              className="overflow-x-auto scrollbar-hide flex gap-6 pb-4 scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {zipperHoodiesProducts.map((product) => (
+                <div key={product.id} className="flex-shrink-0 w-64 md:w-72">
+                  <div className="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-gray-400 transition-all duration-300 relative group h-full">
+                    <div className="absolute top-4 left-4 flex gap-2 z-10">
+                      {product.colors.map((color, idx) => (
+                        <div
+                          key={idx}
+                          className={`w-8 h-8 rounded-full border-2 ${
+                            color === 'black' ? 'bg-black border-white' : 'bg-white border-gray-300'
+                          } shadow-lg`}
+                        ></div>
+                      ))}
+                    </div>
+                    <div className="relative mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-[3/4]">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-sm font-semibold text-gray-800 uppercase mb-2">
+                        {product.name}
+                      </h3>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-gray-900">Sale price {product.price}</span>
+                          <span className="text-sm text-gray-500 line-through">Regular price {product.originalPrice}</span>
+                        </div>
+                        <p className="text-xs text-gray-600">Color {product.colors.join(', ')}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <span className="text-xs font-semibold text-gray-700">#{item.hashtag}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      
-
-      {/* <section className="py-5 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-end mb-10">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Shop by Category</h2>
-              <p className="text-gray-500 mt-2 font-light">Curated essentials for the modern wardrobe.</p>
+              ))}
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                id: 'men',
-                label: 'MEN',
-                sub: 'The Gentleman\'s Edit',
-                image: 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=600&auto=format&fit=crop'
-              },
-              {
-                id: 'women',
-                label: 'WOMEN',
-                sub: 'Elegance Redefined',
-                image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop'
-              },
-              {
-                id: 'watches',
-                label: 'WATCHES',
-                sub: 'Timeless Luxury',
-                image: 'https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=600&auto=format&fit=crop'
-              },
-              {
-                id: 'accessories',
-                label: 'ACCESSORIES',
-                sub: 'Finishing Touches',
-                image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=600&auto=format&fit=crop'
-              }
-            ].map((cat) => (
-              <Link
-                key={cat.id}
-                to={`/${cat.id}`}
-                className="group relative block h-96 overflow-hidden rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500"
-              >
-                
-                <img
-                  src={cat.image}
-                  alt={cat.label}
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                  loading="lazy"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500"></div>
-
-              
-                <div className="absolute bottom-4 left-4 right-4 p-5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg transition-all duration-300 group-hover:bg-white/20 group-hover:bottom-6">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="text-xl font-bold text-white tracking-widest">{cat.label}</h3>
-                      <p className="text-gray-200 text-xs mt-1 font-medium">{cat.sub}</p>
-                    </div>
-
-                    
-                    <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
-      {/* --- BROWSE BY CATEGORY (Accordion - Light & Compact) --- */}
-      <section className="py-5 mb-20 bg-white">
-        <div className="max-w-7xl mx-auto px-2">
-          <div className="mb-8 text-center">
-             <span className="text-amber-600 font-bold tracking-[0.2em] -text-xl uppercase">Curated Collections</span>
-             <h2 className="text-3xl font-bold text-gray-600 mt-2">Shop By Category</h2>
-          </div>
-
-          {/* Accordion Container - Compact Height */}
-          <div className="flex flex-col md:flex-row h-[500px] md:h-[400px] gap-2 w-full">
-            {[
-              { 
-                id: 'men', 
-                label: 'MEN', 
-                desc: 'Sharp tailoring.',
-                // Fixed Image URL
-                image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765192028/1_08426779-951c-47b7-9feb-ef29ca85b27c_frapuz.webp' 
-              },
-              { 
-                id: 'women', 
-                label: 'WOMEN', 
-                desc: 'Modern silhouettes.',
-                image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765191722/c037121844264e7d40ffc2bb11335a21_vadndt.jpg' 
-              },
-              { 
-                id: 'watches', 
-                label: 'WATCHES', 
-                desc: 'Precision crafted.',
-                image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765191651/photo-1524592094714-0f0654e20314_dv6fdz.avif' 
-              },
-              { 
-                id: 'accessories', 
-                label: 'ACCESSORIES', 
-                desc: 'Final touches.',
-                image: 'https://res.cloudinary.com/de1bg8ivx/image/upload/v1765191618/photo-1515562141207-7a88fb7ce338_k4onlv.avif' 
-              }
-            ].map((cat) => (
-              <Link 
-                key={cat.id} 
-                to={`/${cat.id}`} 
-                className="group relative flex-1 hover:grow-[3] transition-all duration-500 ease-out overflow-hidden rounded-lg cursor-pointer"
-              >
-                {/* Background Image */}
-                <div className="absolute inset-0 w-full h-full">
-                  <img 
-                    src={cat.image} 
-                    alt={cat.label} 
-                    className="w-full h-full object-cover filter md:grayscale group-hover:grayscale-0 scale-100 group-hover:scale-105 transition-all duration-500" 
-                  />
-                  {/* Overlay - Lighter for Light Theme */}
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-500"></div>
-                  {/* Text Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80"></div>
-                </div>
-
-                {/* Content */}
-                <div className="absolute bottom-0 w-full p-6 flex flex-col justify-end items-start">
-                  
-                  <h3 className="text-xl md:text-2xl font-bold text-white uppercase tracking-widest mb-1 whitespace-nowrap">
-                    {cat.label}
-                  </h3>
-
-                  <div className="max-h-0 opacity-0 group-hover:max-h-20 group-hover:opacity-100 transition-all duration-500 overflow-hidden">
-                    <p className="text-gray-200 text-sm font-medium mb-2">
-                      {cat.desc}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
+            <button
+              onClick={() => scrollRight(zipperHoodiesScrollRef)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+              aria-label="Next product"
+            >
+              <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </section>
 
-
-      <div className="w-fit m-0 p-0 leading-none overflow-visible h-auto w-auto">
-        <img
-          src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1765186209/83d30f87-eb70-4315-8291-e1880c206991.png"
-          alt="Full size"
-          className="block w-auto h-auto m-0 p-0 border-none outline-none"
-        />
-      </div>
-      {/* <div className="w-fit m-0 p-0 leading-none overflow-visible h-auto w-auto hidden lg:block">
-        <img
-          src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1765186240/d347cf32-1980-4355-9ac5-9168cf727263.png"
-          alt="Full size"
-          className="block w-auto h-auto m-0 p-0 border-none outline-none"
-        />
-      </div> */}
-
-
-
-      {/* --- PRODUCT SECTIONS (Improved Headers and Buttons) --- */}
-
-      <ProductSection
-        title="Fresh Drops"
-        subtitle="Be the first to wear the trend"
-        products={freshDrops}
-        viewAllLink="/men/shoes"
-        isLoading={isLoading}
-      />
-      <div className="w-fit m-0 p-0 leading-none overflow-visible h-auto w-auto hidden lg:block">
-        <h2 className='m-5 text-start text-2xl font-bold'>Coming soon...</h2>
-        <img
-          src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1765187037/ce43b64f-3f08-4346-ad66-1f7306b1006f.png"
-          alt="Full size"
-          className="block w-auto h-auto m-0 p-0 border-none outline-none"
-        />
-      </div>
-
-      <div className="w-fit m-0 p-0 leading-none overflow-visible h-auto w-auto lg:hidden">
-        <img
-          src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1765137210/Black_Elegant_Watch_Special_Offer_Instagram_Post_y3foz1.svg"
-          alt="Full size"
-          className="block w-auto h-auto m-0 p-0 border-none outline-none"
-        />
-      </div>
-
-
-
-      {/* <ProductSection
-        title="Steal Deals"
-        subtitle="Premium styles at unbeatable prices"
-        products={saleItems}
-        viewAllLink="/sale"
-        bgColor="bg-gradient-to-br from-gray-50 to-white"
-        isLoading={isLoading}
-      /> */}
-
-      {/* 3. Men & Women - Grid Layout */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid lg:grid-cols-2 gap-4 lg:gap-12">
-          <div className="bg-gray-100 p-6 border border-gray-200">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-extrabold text-gray-900">For Him</h2>
-              <Link to="/men" className="text-sm font-semibold text-gray-700 hover:text-gray-900 transition">View All</Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {isLoading ? [1, 2].map(i => <SkeletonCard key={i} />) : menItems.map(p => <ProductCard key={p._id} product={p} />)}
-            </div>
+      {/* Hoodies Section */}
+      <section className="w-full bg-white py-16 px-8 md:py-12 md:px-6 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center justify-center mb-12">
+            <h2 className="text-5xl font-light text-black tracking-tight md:text-4xl mb-6">
+              HOODIES
+            </h2>
+            <button className="px-6 py-2 border border-black text-black font-normal uppercase tracking-wide text-sm hover:bg-black hover:text-white transition-all duration-300">
+              VIEW ALL
+            </button>
           </div>
-          <div className="bg-pink-50 p-6 border border-pink-200">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-extrabold text-pink-600">For Her</h2>
-              <Link to="/women" className="text-sm font-semibold text-pink-600 hover:text-pink-800 transition">View All</Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {isLoading ? [1, 2].map(i => <SkeletonCard key={i} />) : womenItems.map(p => <ProductCard key={p._id} product={p} />)}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 mt-12 mb-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-extrabold text-gray-900">Featured Collections</h2>
-          <p className="text-gray-500">Essential styles for him and her.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          <Link to="/women/shirt" className="block w-full overflow-hidden rounded-xl duration-300 group">
-            <img src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1763492921/Black_and_White_Modern_New_Arrivals_Blog_Banner_4_x9v1lw.png" alt="Women" className="w-full h-auto block transform group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-          </Link>
-          <Link to="/men/shirt" className="block w-full overflow-hidden duration-300 group">
-            <img src="https://res.cloudinary.com/de1bg8ivx/image/upload/v1763493394/5ad7474b-2e60-47c5-b993-cdc9c1449c08.png" alt="Men" className="w-full h-auto block transform group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-          </Link>
-        </div>
-      </div>
-
-     
-
-      {/* --- STORY VIEWER MODAL (Unchanged) --- */}
-      {isStoryViewerOpen && activeStoryIndex !== null && (
-        <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center" onClick={() => setIsStoryViewerOpen(false)}>
-          <button onClick={(e) => { e.stopPropagation(); setIsStoryViewerOpen(false); }} className="absolute top-6 right-6 z-20 text-white/70 hover:text-white transition bg-white/10 rounded-full p-2"><IconClose /></button>
-
-          {activeStoryIndex > 0 && <button onClick={(e) => { e.stopPropagation(); setActiveStoryIndex(activeStoryIndex - 1); }} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white hover:opacity-70 bg-white/10 rounded-full p-2"><IconChevronLeft /></button>}
-          {activeStoryIndex < stories.length - 1 && <button onClick={(e) => { e.stopPropagation(); setActiveStoryIndex(activeStoryIndex + 1); }} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white hover:opacity-70 bg-white/10 rounded-full p-2"><IconChevronRight /></button>}
-
-          <div className="relative w-full h-full max-w-md mx-auto flex flex-col items-center justify-center" onClick={(e) => e.stopPropagation()}>
-            <div className="absolute top-4 left-4 right-4 flex gap-1 z-20">
-              {stories.map((_, index) => (
-                <div key={index} className={`h-1 rounded-full flex-1 transition-all duration-300 ${index <= activeStoryIndex ? 'bg-white' : 'bg-white/30'}`} />
+          <div className="relative overflow-x-hidden">
+            <button
+              onClick={() => scrollLeft(hoodiesScrollRef)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+              aria-label="Previous product"
+            >
+              <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div 
+              ref={hoodiesScrollRef}
+              className="overflow-x-auto scrollbar-hide flex gap-6 pb-4 scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {hoodies.map((hoodie) => (
+                <div key={hoodie.id} className="flex-shrink-0 w-64 md:w-72">
+                  <div className="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-gray-400 transition-all duration-300 relative group h-full">
+                    <div className="absolute -top-4 left-4 flex gap-2 z-10">
+                      {hoodie.colors.map((color, idx) => (
+                        <div
+                          key={idx}
+                          className={`w-8 h-8 rounded-full border-2 ${
+                            color === 'black' ? 'bg-black border-white' : 'bg-white border-gray-300'
+                          } shadow-lg`}
+                        ></div>
+                      ))}
+                    </div>
+                    <div className="relative mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-[3/4]">
+                      {hoodie.frontImage && hoodie.backImage ? (
+                        <div className="relative w-full h-full">
+                          <img
+                            src={hoodie.frontImage}
+                            alt={`${hoodie.name} - Front`}
+                            className="w-full h-full object-cover group-hover:opacity-0 transition-opacity duration-300"
+                          />
+                          <img
+                            src={hoodie.backImage}
+                            alt={`${hoodie.name} - Back`}
+                            className="absolute top-0 left-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          />
+                        </div>
+                      ) : (
+                        <img
+                          src={hoodie.image}
+                          alt={hoodie.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      )}
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-sm font-semibold text-gray-800 uppercase mb-1">
+                        {hoodie.name}
+                      </h3>
+                      {hoodie.text && <p className="text-xs text-gray-600 font-medium">{hoodie.text}</p>}
+                      {hoodie.subtitle && <p className="text-xs text-gray-500">{hoodie.subtitle}</p>}
+                      {hoodie.year && <p className="text-xs text-gray-500">{hoodie.year}</p>}
+                      {hoodie.tagline && <p className="text-xs text-gray-500 mt-1">{hoodie.tagline}</p>}
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
-            <img src={stories[activeStoryIndex].image} alt={stories[activeStoryIndex].hashtag} className="w-full h-full object-contain max-h-[85vh] rounded-lg" />
-            <div className="absolute bottom-20 text-center bg-black/50 px-6 py-2 rounded-full backdrop-blur-sm">
-              <span className="text-xl font-bold text-white">{stories[activeStoryIndex].hashtag} {stories[activeStoryIndex].emoji}</span>
+            <button
+              onClick={() => scrollRight(hoodiesScrollRef)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+              aria-label="Next product"
+            >
+              <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Sweatshirts Section */}
+      <section className="w-full bg-white py-16 px-8 md:py-12 md:px-6 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center justify-center mb-12">
+            <h2 className="text-5xl font-light text-black tracking-tight md:text-4xl mb-6">
+              SWEATSHIRTS
+            </h2>
+            <button className="px-6 py-2 border border-black text-black font-normal uppercase tracking-wide text-sm hover:bg-black hover:text-white transition-all duration-300">
+              VIEW ALL
+            </button>
+          </div>
+          <div className="relative overflow-x-hidden">
+            <button
+              onClick={() => scrollLeft(sweatshirtsScrollRef)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+              aria-label="Previous product"
+            >
+              <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div 
+              ref={sweatshirtsScrollRef}
+              className="overflow-x-auto scrollbar-hide flex gap-6 pb-4 scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {sweatshirts.map((sweatshirt) => (
+                <div key={sweatshirt.id} className="flex-shrink-0 w-64 md:w-72">
+                  <div className="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-gray-400 transition-all duration-300 relative group h-full">
+                    <div className="absolute -top-4 left-4 flex gap-2 z-10">
+                      {sweatshirt.colors.map((color, idx) => (
+                        <div
+                          key={idx}
+                          className={`w-8 h-8 rounded-full border-2 ${
+                            color === 'black' 
+                              ? 'bg-black border-white' 
+                              : color === 'white'
+                              ? 'bg-white border-gray-300'
+                              : 'bg-gray-400 border-gray-300'
+                          } shadow-lg`}
+                        ></div>
+                      ))}
+                    </div>
+                    <div className="relative mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-[3/4]">
+                      <img
+                        src={sweatshirt.image}
+                        alt={sweatshirt.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-sm font-semibold text-gray-800 uppercase mb-1">
+                        {sweatshirt.name}
+                      </h3>
+                      {sweatshirt.design && (
+                        <p className="text-xs text-gray-500 mt-1">{sweatshirt.design}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => scrollRight(sweatshirtsScrollRef)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all duration-300 z-20 border-2 border-gray-200 md:flex hidden"
+              aria-label="Next product"
+            >
+              <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Military Collection Section */}
+      <div className="w-full bg-white">
+        <div className="relative w-full h-[70vh] md:h-[75vh] overflow-hidden">
+          <img
+            src="https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767856532/Frame_1000012091_6dbb3d9a-c4aa-455f-bb4c-8fcb4e6b65bb_hxmjl0.jpg"
+            alt="Military Collection"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute bottom-20 left-8 md:left-6 md:bottom-16">
+            <h2 className="text-7xl md:text-5xl lg:text-6xl font-black text-white/90 uppercase tracking-tight leading-tight mb-2 drop-shadow-lg">
+              MILITARY
+            </h2>
+            <h2 className="text-7xl md:text-5xl lg:text-6xl font-black text-white/90 uppercase tracking-tight leading-tight drop-shadow-lg">
+              COLLECTION
+            </h2>
+          </div>
+          <div className="absolute top-32 right-8 md:right-6 md:top-24 text-right">
+            <p className="text-base md:text-sm lg:text-lg text-white/90 uppercase tracking-wide leading-relaxed max-w-sm ml-auto drop-shadow-md">
+              ECHOES OF THE REGIMENT.
+              <br />
+              REIMAGINED FOR THE ROUTINE.
+            </p>
+          </div>
+          <div className="absolute bottom-8 right-8 md:bottom-6 md:right-6 text-white text-sm md:text-xs">
+            <div className="uppercase tracking-wide mb-1">OP-ZONE</div>
+            <div className="font-mono">27.0596° N</div>
+            <div className="font-mono">88.2656° E</div>
+          </div>
+        </div>
+        <div className="w-full bg-white !h-52 py-8 px-8 md:px-6">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
+            <p className="text-base md:text-lg text-gray-800 !text-center leading-relaxed flex-1">
+              The Military Collection by Deployed is forged from the very code that holds the line, discipline, dominance, and duty.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Product Grid Section */}
+      <section className="w-full bg-white">
+        <div className="w-full py-16 px-8 md:py-12 md:px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {firstRowProducts.map((product) => (
+                <div key={product.id} className="group relative bg-white">
+                  {product.colors.length > 0 && (
+                    <div className="absolute top-2 left-2 flex gap-2 z-10">
+                      {product.colors.map((color, idx) => (
+                        <div
+                          key={idx}
+                          className={`w-6 h-6 rounded-full border-2 ${getColorClass(color)} shadow-md`}
+                        ></div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="relative mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-[3/4]">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <button className="absolute bottom-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-100">
+                      <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">
+                      {product.name}
+                    </h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-gray-900">{product.price}</span>
+                      {product.originalPrice && (
+                        <span className="text-xs text-gray-500 line-through">{product.originalPrice}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      )}
-    </div>
-  );
-};
 
-// --- REUSABLE SUB-COMPONENTS ---
-
-const SkeletonCard = () => <div className="h-64 bg-gray-200 animate-pulse rounded-xl"></div>;
-
-const ProductSection = ({ title, subtitle, products, viewAllLink, bgColor = 'bg-white', isLoading }) => {
-  return (
-    <section className={`py-16 ${bgColor}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-end mb-8 border-b pb-4 border-gray-200">
-          <div>
-            <h2 className="text-3xl font-extrabold text-gray-900">{title}</h2>
-            {subtitle && <p className="text-gray-500 mt-1">{subtitle}</p>}
+        {/* Adventure Collection Banner */}
+        <div className="w-full bg-white">
+          <div className="relative w-full h-[70vh] md:h-[75vh] overflow-hidden">
+            <img
+              src="https://res.cloudinary.com/dvkxgrcbv/image/upload/v1767857412/Frame_1000012090_889088bc-d433-4f4e-806b-40decff047fa_yu2p4j.jpg"
+              alt="Adventure Collection"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute bottom-20 right-8 md:right-6 md:bottom-16">
+              <h2 className="text-7xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tight leading-tight drop-shadow-lg">
+                ADVENTURE
+              </h2>
+            </div>
           </div>
-          {viewAllLink && (
-            <Link
-              to={viewAllLink}
-              className="hidden sm:inline-block px-6 py-2 rounded-full border border-gray-300 font-semibold text-white bg-gray-900 hover:bg-gray-900 hover:text-white hover:border-transparent transform"
-            >
-              View All
-            </Link>
-          )}
+          <div className="w-full bg-white !h-52 py-8 px-8 md:px-6">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
+              <p className="text-base md:text-lg !text-center text-gray-800 leading-relaxed flex-1">
+                The Adventure collection by Deployed carries the raw spirit of those who choose the wild over the routine, the roar of engines, the silence of high altitudes, the stare of the wild, and the roads that don't show up on maps.
+              </p>
+            </div>
+          </div>
         </div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}
+        <div className="w-full py-16 px-8 md:py-12 md:px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {secondRowProducts.map((product) => (
+                <div key={product.id} className="group relative bg-white">
+                  {product.colors.length > 0 && (
+                    <div className="absolute top-2 left-2 flex gap-2 z-10">
+                      {product.colors.map((color, idx) => (
+                        <div
+                          key={idx}
+                          className={`w-6 h-6 rounded-full border-2 ${getColorClass(color)} shadow-md`}
+                        ></div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="relative mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-[3/4]">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <button className="absolute bottom-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-100">
+                      <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">
+                      {product.name}
+                    </h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-gray-900">{product.price}</span>
+                      {product.originalPrice && (
+                        <span className="text-xs text-gray-500 line-through">{product.originalPrice}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                aria-label="Previous page"
+              >
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              {[...Array(totalPages)].map((_, index) => {
+                const page = index + 1;
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                      currentPage === page
+                        ? 'bg-gray-900 text-white'
+                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'
+                    }`}
+                    aria-label={`Go to page ${page}`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                aria-label="Next page"
+              >
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {products && products.length > 0 ? (
-              products.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))
-            ) : (
-              <p className="col-span-4 text-center text-gray-500 py-10">No products found.</p>
-            )}
-          </div>
-        )}
+        </div>
+      </section>
 
-        {/* Mobile View All Button (Visible only on small screens) */}
-        {viewAllLink && (
-          <div className="mt-8 text-center sm:hidden">
-            <Link to={viewAllLink} className="inline-block px-8 py-3 rounded-full bg-gray-900 text-white font-semibold shadow-lg">View All</Link>
-          </div>
+      {/* Category Section */}
+      <div className="bg-white py-16">
+        {loading ? (
+          <section className="py-16 px-8 max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-5xl font-bold text-gray-900 mb-4 tracking-tight">Categories</h2>
+              <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto"></div>
+            </div>
+            <div className="flex items-center justify-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            </div>
+          </section>
+        ) : (
+          <>
+            <section className="py-16 px-8 max-w-7xl mx-auto">
+              <div>
+                <h2 className="text-5xl font-black text-black mb-8 tracking-tight md:text-4xl">Shop By Collections</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {collections.map((collection) => (
+                    <div 
+                      key={collection.slug} 
+                      className="group relative bg-white border-2 border-gray-200 rounded-lg p-4 text-base font-semibold text-gray-800 transition-all duration-300 cursor-pointer hover:border-black hover:shadow-lg"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="group-hover:text-black transition-colors duration-300">
+                          {collection.name}
+                        </span>
+                        <svg 
+                          className="w-5 h-5 text-gray-400 group-hover:text-black group-hover:translate-x-1 transition-all duration-300" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+            <div className="w-full bg-white">
+              <img
+                src="https://www.deployed.store/cdn/shop/files/Frame_427321215_17a92bce-7808-44e5-b0d2-ed13ba6a9a5b.jpg?v=1766478114&width=2400"
+                alt="Deployed Store Banner"
+                className="w-full h-auto object-cover"
+              />
+            </div>
+          </>
         )}
       </div>
-    </section>
+
+      {/* Footer */}
+      <footer className="w-full bg-[#f5f5f0] text-gray-800">
+        <div className="max-w-7xl mx-auto px-8 py-12 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-6 lg:gap-8">
+            <div>
+              <h3 className="text-sm font-bold uppercase mb-4 tracking-wide text-gray-800">SHOP BY CATEGORY</h3>
+              <ul className="space-y-2">
+                <li><a href="/collections/t-shirt" className="text-sm text-gray-700 hover:text-gray-900 block">T-Shirt</a></li>
+                <li><a href="/collections/polos" className="text-sm text-gray-700 hover:text-gray-900 block">Polos</a></li>
+                <li><a href="/collections/full-sleeves" className="text-sm text-gray-700 hover:text-gray-900 block">Full Sleeves</a></li>
+                <li><a href="/collections/cargo-shirts" className="text-sm text-gray-700 hover:text-gray-900 block">Cargo Shirts</a></li>
+                <li><a href="/collections/oversized" className="text-sm text-gray-700 hover:text-gray-900 block">Oversized</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold uppercase mb-4 tracking-wide text-gray-800">SHOP BY COLLECTIONS</h3>
+              <ul className="space-y-2">
+                <li><a href="/collections/military" className="text-sm text-gray-700 hover:text-gray-900 block">Military</a></li>
+                <li><a href="/collections/adventure" className="text-sm text-gray-700 hover:text-gray-900 block">Adventure</a></li>
+                <li><a href="/collections/patriot" className="text-sm text-gray-700 hover:text-gray-900 block">Patriot</a></li>
+                <li><a href="/collections/champions" className="text-sm text-gray-700 hover:text-gray-900 block">Champions</a></li>
+                <li><a href="/collections/men-at-work" className="text-sm text-gray-700 hover:text-gray-900 block">Men At Work</a></li>
+                <li><a href="/collections/transport" className="text-sm text-gray-700 hover:text-gray-900 block">Transport</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold uppercase mb-4 tracking-wide text-gray-800">POLICIES</h3>
+              <ul className="space-y-2">
+                <li><a href="/policies/privacy-policy" className="text-sm text-gray-700 hover:text-gray-900 block">Privacy Policy</a></li>
+                <li><a href="/policies/return-and-exchange-policy" className="text-sm text-gray-700 hover:text-gray-900 block">Return and Exchange Policy</a></li>
+                <li><a href="/policies/shipping-policy" className="text-sm text-gray-700 hover:text-gray-900 block">Shipping Policy</a></li>
+                <li><a href="/policies/terms-of-service" className="text-sm text-gray-700 hover:text-gray-900 block">Terms of Service</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold uppercase mb-4 tracking-wide text-gray-800">NEWSLETTER</h3>
+              <p className="text-sm text-gray-700 mb-4">
+                Sign up to our newsletter to receive exclusive offers.
+              </p>
+              <form onSubmit={handleSubscribe} className="mb-3">
+                <div className="flex w-full">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="E-mail"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-l text-xs bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-400"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-gray-800 text-white uppercase text-xs font-semibold rounded-r hover:bg-gray-900 whitespace-nowrap"
+                  >
+                    SUBSCRIBE
+                  </button>
+                </div>
+              </form>
+              <p className="text-xs text-gray-600">
+                By signing up to our newsletter, you agree with our privacy policy.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-gray-200">
+          <div className="max-w-7xl mx-auto px-8 py-14 md:px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
+              <div>
+                <h3 className="text-sm font-bold uppercase mb-6 tracking-wider text-gray-900">CONTACT US</h3>
+                <div className="space-y-3 text-sm text-gray-600">
+                  <p>
+                    <a href="/track-order" className="underline hover:text-gray-900 transition-colors duration-200 font-medium">
+                      Track your Order - Click Here
+                    </a>
+                  </p>
+                  <p className="text-gray-700">The Accesories</p>
+                  <p>
+                    <span className="font-semibold text-gray-800">Email</span> - <a href="mailto:support@deployed.store" className="hover:text-gray-900 transition-colors">support@deployed.store</a>
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-800">Phone No.</span> - <a href="tel:+918047360314" className="hover:text-gray-900 transition-colors">+91 80 4736 0314</a>
+                  </p>
+                  <p className="text-xs text-gray-500">( Mon - Fri 11 AM - 6 PM )</p>
+                  <p className="text-xs text-gray-500">( Sat - 11 AM - 5 PM )</p>
+                  <div className="mt-5">
+                    <div className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-white border border-gray-300 rounded-md cursor-pointer hover:border-gray-400 hover:shadow-sm transition-all duration-200">
+                      <span className="text-xl">🇮🇳</span>
+                      <span className="text-sm font-semibold text-gray-800">INR</span>
+                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="mt-5 text-gray-700">50 B C Road, Kolkata - 700050</p>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold uppercase mb-6 tracking-wider text-gray-900">ABOUT US</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  At Deployed, we celebrate passions that demand courage and resilience. From aviation to military, 
+                  expeditions to wildlife, and the high seas to the open roads, our brand is built for those who live boldly.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-gray-200 bg-[#f5f5f0]">
+          <div className="max-w-7xl mx-auto px-8 py-6 md:px-6">
+            <p className="text-xs text-gray-500 text-center">
+              © 2026 - Deployed Copyrighted and Owned by - Squawk Supply Core Pvt Ltd
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
-};
+}
 
-
-
-export default Home;
+export default Homepage;
