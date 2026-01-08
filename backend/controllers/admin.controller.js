@@ -1,38 +1,42 @@
 import User from '../models/User.js';
 import Order from '../models/Order.js';
-import Men from '../models/product/menModel.js';
 import MenTshirt from '../models/product/menTshirt.model.js';
-import Women from '../models/product/womenModel.js';
-import Watch from '../models/product/watch.model.js';
-import WatchNew from '../models/product/watchNew.model.js';
-import Lens from '../models/product/lens.model.js';
-import Accessory from '../models/product/accessory.model.js';
-import Shoes from '../models/product/shoes.model.js';
-import Saree from '../models/product/saree.model.js';
+import TShirt from '../models/product/tShirt.js';
+import FullSleeveTShirt from '../models/product/fullsleevetshirt.js';
+import Polo from '../models/product/polo.js';
+import Oversized from '../models/product/oversized.js';
+import CargoShirt from '../models/product/cargoshirt.js';
+import Sweatshirt from '../models/product/sweatshirt.js';
+import Hoodies from '../models/product/hoodies.js';
+import ZipperHoodies from '../models/product/zipperhoodies.js';
+import Jacket from '../models/product/jacket.js';
 
 const productModelMap = {
-  men: Men,
   'men-tshirt': MenTshirt,
   'MenTshirt': MenTshirt,
   'Tshirts': MenTshirt,
   'Tshirt': MenTshirt,
-  women: Women,
-  watch: Watch,
-  watches: Watch,
-  'watch-new': WatchNew,
-  'WATCH': WatchNew,
-  'WATCHES': WatchNew,
-  lens: Lens,
-  lenses: Lens,
-  accessory: Accessory,
-  accessories: Accessory,
-  shoes: Shoes,
-  'Shoes': Shoes,
-  'Shoe': Shoes,
-  saree: Saree,
-  'Saree': Saree,
-  'SARI': Saree,
-  'sari': Saree,
+  't-shirt': TShirt,
+  'T-Shirt': TShirt,
+  'full-sleeve-t-shirt': FullSleeveTShirt,
+  'Full Sleeve T-Shirt': FullSleeveTShirt,
+  'FullSleeveTShirt': FullSleeveTShirt,
+  'polo': Polo,
+  'Polo': Polo,
+  'oversized': Oversized,
+  'Oversized': Oversized,
+  'cargo-shirt': CargoShirt,
+  'Cargo Shirt': CargoShirt,
+  'CargoShirt': CargoShirt,
+  'sweatshirt': Sweatshirt,
+  'Sweatshirt': Sweatshirt,
+  'hoodies': Hoodies,
+  'Hoodies': Hoodies,
+  'zipper-hoodies': ZipperHoodies,
+  'Zipper Hoodies': ZipperHoodies,
+  'ZipperHoodies': ZipperHoodies,
+  'jacket': Jacket,
+  'Jacket': Jacket,
 };
 
 const resolveProductModel = (category) => {
@@ -62,56 +66,62 @@ export const getDashboardSummary = async (req, res) => {
       totalOrders,
       pendingOrders,
       totalRevenue,
-      menCount,
-      womenCount,
-      watchCount,
-      watchNewCount,
-      lensCount,
-      accessoryCount,
       menTshirtCount,
-      shoesCount,
-      sareeCount,
+      tShirtCount,
+      fullSleeveTShirtCount,
+      poloCount,
+      oversizedCount,
+      cargoShirtCount,
+      sweatshirtCount,
+      hoodiesCount,
+      zipperHoodiesCount,
+      jacketCount,
     ] = await Promise.all([
       User.countDocuments(), // Count all user documents
       Order.countDocuments(), // Count all order documents
       Order.countDocuments({ status: 'pending' }),
       Order.aggregate([{ $group: { _id: null, total: { $sum: '$totalAmount' } } }]),
-      Men.countDocuments(), // Count ALL men products (including duplicates)
-      Women.countDocuments(), // Count ALL women products (including duplicates)
-      Watch.countDocuments(), // Count ALL watch products (including duplicates)
-      WatchNew.countDocuments().catch(() => 0), // Count ALL new watch products (including duplicates)
-      Lens.countDocuments(), // Count ALL lens products (including duplicates)
-      Accessory.countDocuments(), // Count ALL accessory products (including duplicates)
-      MenTshirt.countDocuments().catch(() => 0), // Count ALL men t-shirt products (including duplicates)
-      Shoes.countDocuments().catch(() => 0), // Count ALL shoes products (including duplicates)
-      Saree.countDocuments().catch(() => 0), // Count ALL saree products (including duplicates)
+      MenTshirt.countDocuments().catch(() => 0), // Count ALL men t-shirt products
+      TShirt.countDocuments().catch(() => 0), // Count ALL t-shirt products
+      FullSleeveTShirt.countDocuments().catch(() => 0), // Count ALL full sleeve t-shirt products
+      Polo.countDocuments().catch(() => 0), // Count ALL polo products
+      Oversized.countDocuments().catch(() => 0), // Count ALL oversized products
+      CargoShirt.countDocuments().catch(() => 0), // Count ALL cargo shirt products
+      Sweatshirt.countDocuments().catch(() => 0), // Count ALL sweatshirt products
+      Hoodies.countDocuments().catch(() => 0), // Count ALL hoodies products
+      ZipperHoodies.countDocuments().catch(() => 0), // Count ALL zipper hoodies products
+      Jacket.countDocuments().catch(() => 0), // Count ALL jacket products
     ]);
 
     // Calculate total products from all collections
-    // This includes: duplicates, products in multiple collections, all variations
-    // Each document is counted separately, so if a product appears 2x or 3x, it's counted 2x or 3x
-    const totalProducts = menCount + womenCount + watchCount + watchNewCount + lensCount + accessoryCount + menTshirtCount + shoesCount + sareeCount;
+    const totalProducts = menTshirtCount + tShirtCount + fullSleeveTShirtCount + poloCount + 
+                         oversizedCount + cargoShirtCount + sweatshirtCount + hoodiesCount + 
+                         zipperHoodiesCount + jacketCount;
 
-    // Calculate inventory totals (avoid double counting)
+    // Calculate inventory totals
     const inventory = {
-      men: menCount + menTshirtCount, // Men includes men t-shirts
-      women: womenCount + sareeCount, // Women includes sarees
-      watches: watchCount + watchNewCount, // Combined watch count (old + new schema)
-      lens: lensCount,
-      accessories: accessoryCount + shoesCount, // Accessories includes shoes
-      saree: sareeCount, // Saree count separately for reference
+      'T-Shirts': menTshirtCount + tShirtCount,
+      'Full Sleeve T-Shirts': fullSleeveTShirtCount,
+      'Polo': poloCount,
+      'Oversized': oversizedCount,
+      'Cargo Shirt': cargoShirtCount,
+      'Sweatshirt': sweatshirtCount,
+      'Hoodies': hoodiesCount,
+      'Zipper Hoodies': zipperHoodiesCount,
+      'Jacket': jacketCount,
     };
 
-    // Category-wise product counts (individual collections)
-    // Note: Sarees are included in women count, not shown separately
-    // Note: Men T-Shirts are included in men count, not shown separately
-    // Note: Shoes are included in accessories count, not shown separately
+    // Category-wise product counts
     const categoryCounts = {
-      men: menCount + menTshirtCount, // Men includes men t-shirts
-      women: womenCount + sareeCount, // Women includes sarees
-      watches: watchCount + watchNewCount,
-      lens: lensCount,
-      accessories: accessoryCount + shoesCount, // Accessories includes shoes
+      'T-Shirts': menTshirtCount + tShirtCount,
+      'Full Sleeve T-Shirts': fullSleeveTShirtCount,
+      'Polo': poloCount,
+      'Oversized': oversizedCount,
+      'Cargo Shirt': cargoShirtCount,
+      'Sweatshirt': sweatshirtCount,
+      'Hoodies': hoodiesCount,
+      'Zipper Hoodies': zipperHoodiesCount,
+      'Jacket': jacketCount,
     };
 
     res.status(200).json({
@@ -217,19 +227,28 @@ export const deleteOrder = async (req, res) => {
   }
 };
 
-// Helper function to normalize saree products for admin panel
-const normalizeSareeForAdmin = (product) => {
+// Helper function to normalize products for admin panel
+const normalizeProductForAdmin = (product) => {
   const normalized = product.toObject ? product.toObject() : product;
   
-  // Convert images object to array format
+  // Convert images object to array format (using new image field names)
   let imagesArray = [];
   if (normalized.images && typeof normalized.images === 'object' && !Array.isArray(normalized.images)) {
-    imagesArray = [
-      normalized.images.image1,
-      normalized.images.image2,
-      normalized.images.image3,
-      normalized.images.image4,
-    ].filter(Boolean);
+    // Use the new image field names
+    const imageOrder = [
+      'T-Shirt',
+      'Full Sleeve T-Shirt',
+      'Polo',
+      'Oversized',
+      'Cargo Shirt',
+      'Sweatshirt',
+      'Hoodies',
+      'Zipper Hoodies',
+      'Jacket'
+    ];
+    imagesArray = imageOrder
+      .map(key => normalized.images[key])
+      .filter(img => img && typeof img === 'string' && img.trim() !== '');
   } else if (Array.isArray(normalized.images)) {
     imagesArray = normalized.images.filter(img => img && typeof img === 'string' && img.trim() !== '');
   }
@@ -249,8 +268,7 @@ const normalizeSareeForAdmin = (product) => {
     finalPrice: finalPrice,
     images: imagesArray,
     brand: brand,
-    category: 'women',
-    subCategory: 'saree', // Set subCategory for filtering
+    category: normalized.category || '',
   };
 };
 
@@ -259,61 +277,11 @@ export const getAdminProducts = async (req, res) => {
     const { category } = req.query;
 
     if (category) {
-      // Special handling for 'saree' category - only fetch from Saree collection
-      if (category === 'saree') {
-        const sareeProducts = await Saree.find().sort({ updatedAt: -1 }).limit(200);
-        const normalizedSarees = sareeProducts.map(normalizeSareeForAdmin);
-        
-        return res.status(200).json({
-          success: true,
-          data: { products: normalizedSarees },
-        });
-      }
-      
-      // Special handling for 'women' category to include sarees
-      if (category === 'women') {
-        const [womenProducts, sareeProducts] = await Promise.all([
-          Women.find().sort({ updatedAt: -1 }).limit(200),
-          Saree.find().sort({ updatedAt: -1 }).limit(200),
-        ]);
-        
-        const normalizedWomen = womenProducts.map(item => item.toObject());
-        const normalizedSarees = sareeProducts.map(normalizeSareeForAdmin);
-        
-        const allProducts = [...normalizedWomen, ...normalizedSarees].sort((a, b) => {
-          const dateA = new Date(a.updatedAt || a.createdAt || 0);
-          const dateB = new Date(b.updatedAt || b.createdAt || 0);
-          return dateB - dateA;
-        });
-        
-        return res.status(200).json({
-          success: true,
-          data: { products: allProducts },
-        });
-      }
-      
       const Model = resolveProductModel(category);
       const products = await Model.find().sort({ updatedAt: -1 }).limit(200);
       
       // Normalize products to ensure images are arrays
-      const normalizedProducts = products.map((product) => {
-        const productObj = product.toObject ? product.toObject() : product;
-        
-        // Normalize images to array format
-        if (productObj.images && typeof productObj.images === 'object' && !Array.isArray(productObj.images)) {
-          // Convert object format { image1, image2, ... } to array
-          productObj.images = [
-            productObj.images.image1,
-            productObj.images.image2,
-            productObj.images.image3,
-            productObj.images.image4,
-          ].filter(Boolean);
-        } else if (!Array.isArray(productObj.images)) {
-          productObj.images = productObj.images ? [productObj.images] : [];
-        }
-        
-        return productObj;
-      });
+      const normalizedProducts = products.map(normalizeProductForAdmin);
       
       return res.status(200).json({
         success: true,
@@ -321,29 +289,34 @@ export const getAdminProducts = async (req, res) => {
       });
     }
 
-    const [men, menTshirts, women, watches, lens, accessories, shoes, sarees] = await Promise.all([
-      Men.find().limit(50),
+    // Fetch from all collections if no category specified
+    const [menTshirts, tShirts, fullSleeveTShirts, polos, oversized, cargoShirts, sweatshirts, hoodies, zipperHoodies, jackets] = await Promise.all([
       MenTshirt.find().limit(50).catch(() => []),
-      Women.find().limit(50),
-      Watch.find().limit(50),
-      Lens.find().limit(50),
-      Accessory.find().limit(50),
-      Shoes.find().limit(50).catch(() => []),
-      Saree.find().limit(50),
+      TShirt.find().limit(50).catch(() => []),
+      FullSleeveTShirt.find().limit(50).catch(() => []),
+      Polo.find().limit(50).catch(() => []),
+      Oversized.find().limit(50).catch(() => []),
+      CargoShirt.find().limit(50).catch(() => []),
+      Sweatshirt.find().limit(50).catch(() => []),
+      Hoodies.find().limit(50).catch(() => []),
+      ZipperHoodies.find().limit(50).catch(() => []),
+      Jacket.find().limit(50).catch(() => []),
     ]);
 
     res.status(200).json({
       success: true,
       data: {
         products: [
-          ...men.map((item) => ({ ...item.toObject(), category: 'men' })),
-          ...menTshirts.map((item) => ({ ...item.toObject(), category: 'men' })),
-          ...women.map((item) => ({ ...item.toObject(), category: 'women' })),
-          ...watches.map((item) => ({ ...item.toObject(), category: 'watches' })),
-          ...lens.map((item) => ({ ...item.toObject(), category: 'lens' })),
-          ...accessories.map((item) => ({ ...item.toObject(), category: 'accessories' })),
-          ...shoes.map((item) => ({ ...item.toObject(), category: 'shoes' })),
-          ...sarees.map((item) => ({ ...item.toObject(), category: 'saree' })),
+          ...menTshirts.map((item) => normalizeProductForAdmin(item)),
+          ...tShirts.map((item) => normalizeProductForAdmin(item)),
+          ...fullSleeveTShirts.map((item) => normalizeProductForAdmin(item)),
+          ...polos.map((item) => normalizeProductForAdmin(item)),
+          ...oversized.map((item) => normalizeProductForAdmin(item)),
+          ...cargoShirts.map((item) => normalizeProductForAdmin(item)),
+          ...sweatshirts.map((item) => normalizeProductForAdmin(item)),
+          ...hoodies.map((item) => normalizeProductForAdmin(item)),
+          ...zipperHoodies.map((item) => normalizeProductForAdmin(item)),
+          ...jackets.map((item) => normalizeProductForAdmin(item)),
         ],
       },
     });
@@ -358,60 +331,45 @@ export const getAdminProducts = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    let { category, subCategory, ...productData } = req.body;
+    let { category, ...productData } = req.body;
     
-    // If category is 'women' and subCategory is 'saree', use Saree model
-    if (category === 'women' && subCategory && subCategory.toLowerCase() === 'saree') {
-      const Model = Saree;
-      // Convert product data to saree schema format
-      const sareeData = {
-        title: productData.name || productData.title,
-        mrp: productData.originalPrice || productData.price || productData.mrp || 0,
-        discountPercent: productData.discountPercent || 0,
-        description: productData.description || '',
-        category: 'Saree',
-        categoryId: productData.categoryId || 'women-saree',
-        product_info: {
-          brand: productData.brand || '',
-          manufacturer: productData.manufacturer || '',
-          SareeLength: productData.SareeLength || '',
-          SareeMaterial: productData.SareeMaterial || '',
-          SareeColor: productData.SareeColor || '',
-          IncludedComponents: productData.IncludedComponents || '',
-        },
-        images: Array.isArray(productData.images) && productData.images.length > 0
-          ? {
-              image1: productData.images[0] || '',
-              image2: productData.images[1] || '',
-              image3: productData.images[2] || '',
-              image4: productData.images[3] || '',
-            }
-          : { image1: '' },
-        stock: productData.stock || 0,
-        sizes: productData.sizes || [],
-        isNewArrival: productData.isNewArrival || false,
-        onSale: productData.onSale || false,
-        isFeatured: productData.isFeatured || false,
-        inStock: (productData.stock || 0) > 0,
-        rating: productData.rating || 0,
-        ratingsCount: productData.ratingsCount || 0,
-        reviewsCount: productData.reviewsCount || 0,
-      };
-      const product = await Model.create(sareeData);
-      return res.status(201).json({
-        success: true,
-        message: 'Product created successfully',
-        data: { product: normalizeSareeForAdmin(product) },
+    const Model = resolveProductModel(category);
+    
+    // Convert images array to object format with new field names
+    if (Array.isArray(productData.images) && productData.images.length > 0) {
+      const imageOrder = [
+        'T-Shirt',
+        'Full Sleeve T-Shirt',
+        'Polo',
+        'Oversized',
+        'Cargo Shirt',
+        'Sweatshirt',
+        'Hoodies',
+        'Zipper Hoodies',
+        'Jacket'
+      ];
+      productData.images = {};
+      imageOrder.forEach((key, index) => {
+        if (productData.images[index]) {
+          productData.images[key] = productData.images[index];
+        }
+      });
+      // Remove the array and use the object
+      const imagesArray = productData.images;
+      productData.images = {};
+      imagesArray.forEach((img, index) => {
+        if (img && imageOrder[index]) {
+          productData.images[imageOrder[index]] = img;
+        }
       });
     }
     
-    const Model = resolveProductModel(category);
     const product = await Model.create(productData);
 
     res.status(201).json({
       success: true,
       message: 'Product created successfully',
-      data: { product },
+      data: { product: normalizeProductForAdmin(product) },
     });
   } catch (error) {
     res.status(500).json({
@@ -424,99 +382,33 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    let { category, subCategory, ...productData } = req.body;
-    
-    // Check if product exists in Saree collection first
-    let product = await Saree.findById(req.params.id);
-    if (product) {
-      // It's a saree product, update in Saree collection
-      const updateData = {
-        title: productData.name || productData.title || product.title,
-        mrp: productData.originalPrice || productData.price || productData.mrp || product.mrp,
-        discountPercent: productData.discountPercent !== undefined ? productData.discountPercent : product.discountPercent,
-        description: productData.description !== undefined ? productData.description : product.description,
-        product_info: {
-          brand: productData.brand || product.product_info?.brand || '',
-          manufacturer: productData.manufacturer || product.product_info?.manufacturer || '',
-          SareeLength: productData.SareeLength || product.product_info?.SareeLength || '',
-          SareeMaterial: productData.SareeMaterial || product.product_info?.SareeMaterial || '',
-          SareeColor: productData.SareeColor || product.product_info?.SareeColor || '',
-          IncludedComponents: productData.IncludedComponents || product.product_info?.IncludedComponents || '',
-        },
-        stock: productData.stock !== undefined ? productData.stock : product.stock,
-        sizes: productData.sizes || product.sizes || [],
-        isNewArrival: productData.isNewArrival !== undefined ? productData.isNewArrival : product.isNewArrival,
-        onSale: productData.onSale !== undefined ? productData.onSale : product.onSale,
-        isFeatured: productData.isFeatured !== undefined ? productData.isFeatured : product.isFeatured,
-        inStock: (productData.stock !== undefined ? productData.stock : product.stock) > 0,
-      };
-      
-      if (Array.isArray(productData.images) && productData.images.length > 0) {
-        updateData.images = {
-          image1: productData.images[0] || '',
-          image2: productData.images[1] || '',
-          image3: productData.images[2] || '',
-          image4: productData.images[3] || '',
-        };
-      }
-      
-      product = await Saree.findByIdAndUpdate(req.params.id, updateData, { new: true });
-      return res.status(200).json({
-        success: true,
-        message: 'Product updated successfully',
-        data: { product: normalizeSareeForAdmin(product) },
-      });
-    }
-    
-    // If category is 'women' and subCategory is 'saree', use Saree model
-    if (category === 'women' && subCategory && subCategory.toLowerCase() === 'saree') {
-      const Model = Saree;
-      const updateData = {
-        title: productData.name || productData.title,
-        mrp: productData.originalPrice || productData.price || productData.mrp || 0,
-        discountPercent: productData.discountPercent || 0,
-        description: productData.description || '',
-        product_info: {
-          brand: productData.brand || '',
-          manufacturer: productData.manufacturer || '',
-          SareeLength: productData.SareeLength || '',
-          SareeMaterial: productData.SareeMaterial || '',
-          SareeColor: productData.SareeColor || '',
-          IncludedComponents: productData.IncludedComponents || '',
-        },
-        stock: productData.stock || 0,
-        sizes: productData.sizes || [],
-        isNewArrival: productData.isNewArrival || false,
-        onSale: productData.onSale || false,
-        isFeatured: productData.isFeatured || false,
-        inStock: (productData.stock || 0) > 0,
-      };
-      
-      if (Array.isArray(productData.images) && productData.images.length > 0) {
-        updateData.images = {
-          image1: productData.images[0] || '',
-          image2: productData.images[1] || '',
-          image3: productData.images[2] || '',
-          image4: productData.images[3] || '',
-        };
-      }
-      
-      product = await Model.findByIdAndUpdate(req.params.id, updateData, { new: true });
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: 'Product not found',
-        });
-      }
-      return res.status(200).json({
-        success: true,
-        message: 'Product updated successfully',
-        data: { product: normalizeSareeForAdmin(product) },
-      });
-    }
+    let { category, ...productData } = req.body;
     
     const Model = resolveProductModel(category);
-    product = await Model.findByIdAndUpdate(req.params.id, productData, { new: true });
+    
+    // Convert images array to object format with new field names
+    if (Array.isArray(productData.images) && productData.images.length > 0) {
+      const imageOrder = [
+        'T-Shirt',
+        'Full Sleeve T-Shirt',
+        'Polo',
+        'Oversized',
+        'Cargo Shirt',
+        'Sweatshirt',
+        'Hoodies',
+        'Zipper Hoodies',
+        'Jacket'
+      ];
+      const imagesArray = productData.images;
+      productData.images = {};
+      imagesArray.forEach((img, index) => {
+        if (img && imageOrder[index]) {
+          productData.images[imageOrder[index]] = img;
+        }
+      });
+    }
+    
+    const product = await Model.findByIdAndUpdate(req.params.id, productData, { new: true });
 
     if (!product) {
       return res.status(404).json({
@@ -528,7 +420,7 @@ export const updateProduct = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Product updated successfully',
-      data: { product },
+      data: { product: normalizeProductForAdmin(product) },
     });
   } catch (error) {
     res.status(500).json({
@@ -586,18 +478,8 @@ export const deleteProduct = async (req, res) => {
   try {
     const { category } = req.query;
     
-    // Check if product exists in Saree collection first
-    let product = await Saree.findById(req.params.id);
-    if (product) {
-      await Saree.findByIdAndDelete(req.params.id);
-      return res.status(200).json({
-        success: true,
-        message: 'Product deleted successfully',
-      });
-    }
-    
     const Model = resolveProductModel(category);
-    product = await Model.findByIdAndDelete(req.params.id);
+    const product = await Model.findByIdAndDelete(req.params.id);
 
     if (!product) {
       return res.status(404).json({

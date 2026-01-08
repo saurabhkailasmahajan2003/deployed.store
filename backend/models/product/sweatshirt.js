@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const menTshirtSchema = new mongoose.Schema({
+const sweatshirtSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -23,8 +23,8 @@ const menTshirtSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['Tshirts', 'Tshirt', 'tshirt', 'TSHIRT'],
-    default: 'Tshirts',
+    enum: ['Sweatshirt', 'sweatshirt', 'SWEATSHIRT'],
+    default: 'Sweatshirt',
     required: true,
   },
   categoryId: {
@@ -152,7 +152,7 @@ const menTshirtSchema = new mongoose.Schema({
 });
 
 // Calculate final price (mrp - discount)
-menTshirtSchema.virtual('finalPrice').get(function() {
+sweatshirtSchema.virtual('finalPrice').get(function() {
   if (this.discountPercent > 0) {
     return this.mrp - (this.mrp * this.discountPercent / 100);
   }
@@ -160,23 +160,22 @@ menTshirtSchema.virtual('finalPrice').get(function() {
 });
 
 // Ensure virtuals are included in JSON output
-menTshirtSchema.set('toJSON', { virtuals: true });
-menTshirtSchema.set('toObject', { virtuals: true });
+sweatshirtSchema.set('toJSON', { virtuals: true });
+sweatshirtSchema.set('toObject', { virtuals: true });
 
 // Update timestamp before saving
-menTshirtSchema.pre('save', function (next) {
+sweatshirtSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
 // Indexes
-menTshirtSchema.index({ category: 1 });
-menTshirtSchema.index({ categoryId: 1 });
-menTshirtSchema.index({ title: 'text', description: 'text' });
-menTshirtSchema.index({ 'product_info.brand': 1 });
+sweatshirtSchema.index({ category: 1 });
+sweatshirtSchema.index({ categoryId: 1 });
+sweatshirtSchema.index({ title: 'text', description: 'text' });
+sweatshirtSchema.index({ 'product_info.brand': 1 });
 
-// Use 'MenTshirt' as the collection name
-const MenTshirt = mongoose.model('MenTshirt', menTshirtSchema, 'MenTshirt');
+// Use 'Sweatshirt' as the collection name
+const Sweatshirt = mongoose.model('Sweatshirt', sweatshirtSchema, 'Sweatshirt');
 
-export default MenTshirt;
-
+export default Sweatshirt;

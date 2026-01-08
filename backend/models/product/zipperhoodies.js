@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const watchNewSchema = new mongoose.Schema({
+const zipperHoodiesSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -23,8 +23,8 @@ const watchNewSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['WATCH', 'WATCHES'],
-    default: 'WATCH',
+    enum: ['Zipper Hoodies', 'ZipperHoodies', 'zipperhoodies', 'ZIPPER HOODIES'],
+    default: 'Zipper Hoodies',
     required: true,
   },
   categoryId: {
@@ -40,22 +40,61 @@ const watchNewSchema = new mongoose.Schema({
       type: String,
       trim: true,
     },
+    tshirtSize: {
+      type: String,
+      trim: true,
+    },
+    tshirtMaterial: {
+      type: String,
+      trim: true,
+    },
+    tshirtFit: {
+      type: String,
+      trim: true,
+    },
+    tshirtSleeve: {
+      type: String,
+      trim: true,
+    },
+    tshirtNeck: {
+      type: String,
+      trim: true,
+    },
+    tshirtColor: {
+      type: String,
+      trim: true,
+    },
     IncludedComponents: {
       type: String,
       trim: true,
     },
   },
   images: {
-    image1: {
+    'T-Shirt': {
       type: String,
     },
-    image2: {
+    'Full Sleeve T-Shirt': {
       type: String,
     },
-    image3: {
+    'Polo': {
       type: String,
     },
-    image4: {
+    'Oversized': {
+      type: String,
+    },
+    'Cargo Shirt': {
+      type: String,
+    },
+    'Sweatshirt': {
+      type: String,
+    },
+    'Hoodies': {
+      type: String,
+    },
+    'Zipper Hoodies': {
+      type: String,
+    },
+    'Jacket': {
       type: String,
     },
   },
@@ -81,6 +120,9 @@ const watchNewSchema = new mongoose.Schema({
     default: 0,
     min: 0,
   },
+  sizes: [{
+    type: String,
+  }],
   isNewArrival: {
     type: Boolean,
     default: false,
@@ -110,7 +152,7 @@ const watchNewSchema = new mongoose.Schema({
 });
 
 // Calculate final price (mrp - discount)
-watchNewSchema.virtual('finalPrice').get(function() {
+zipperHoodiesSchema.virtual('finalPrice').get(function() {
   if (this.discountPercent > 0) {
     return this.mrp - (this.mrp * this.discountPercent / 100);
   }
@@ -118,23 +160,22 @@ watchNewSchema.virtual('finalPrice').get(function() {
 });
 
 // Ensure virtuals are included in JSON output
-watchNewSchema.set('toJSON', { virtuals: true });
-watchNewSchema.set('toObject', { virtuals: true });
+zipperHoodiesSchema.set('toJSON', { virtuals: true });
+zipperHoodiesSchema.set('toObject', { virtuals: true });
 
 // Update timestamp before saving
-watchNewSchema.pre('save', function (next) {
+zipperHoodiesSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
 // Indexes
-watchNewSchema.index({ category: 1 });
-watchNewSchema.index({ categoryId: 1 });
-watchNewSchema.index({ title: 'text', description: 'text' });
-watchNewSchema.index({ 'product_info.brand': 1 });
+zipperHoodiesSchema.index({ category: 1 });
+zipperHoodiesSchema.index({ categoryId: 1 });
+zipperHoodiesSchema.index({ title: 'text', description: 'text' });
+zipperHoodiesSchema.index({ 'product_info.brand': 1 });
 
-// Use 'WATCH' as the collection name
-const WatchNew = mongoose.model('WatchNew', watchNewSchema, 'WATCH');
+// Use 'ZipperHoodies' as the collection name
+const ZipperHoodies = mongoose.model('ZipperHoodies', zipperHoodiesSchema, 'ZipperHoodies');
 
-export default WatchNew;
-
+export default ZipperHoodies;

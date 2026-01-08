@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const shoesSchema = new mongoose.Schema({
+const poloSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -23,8 +23,8 @@ const shoesSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['Shoes', 'Shoe', 'shoes', 'shoe', 'SHOES'],
-    default: 'Shoes',
+    enum: ['Polo', 'polo', 'POLO'],
+    default: 'Polo',
     required: true,
   },
   categoryId: {
@@ -40,22 +40,27 @@ const shoesSchema = new mongoose.Schema({
       type: String,
       trim: true,
     },
-    availableSizes: [{
-      type: String,
-    }],
-    shoeSize: {
+    tshirtSize: {
       type: String,
       trim: true,
     },
-    shoeMaterial: {
+    tshirtMaterial: {
       type: String,
       trim: true,
     },
-    shoeColor: {
+    tshirtFit: {
       type: String,
       trim: true,
     },
-    shoeType: {
+    tshirtSleeve: {
+      type: String,
+      trim: true,
+    },
+    tshirtNeck: {
+      type: String,
+      trim: true,
+    },
+    tshirtColor: {
       type: String,
       trim: true,
     },
@@ -65,16 +70,31 @@ const shoesSchema = new mongoose.Schema({
     },
   },
   images: {
-    image1: {
+    'T-Shirt': {
       type: String,
     },
-    image2: {
+    'Full Sleeve T-Shirt': {
       type: String,
     },
-    image3: {
+    'Polo': {
       type: String,
     },
-    image4: {
+    'Oversized': {
+      type: String,
+    },
+    'Cargo Shirt': {
+      type: String,
+    },
+    'Sweatshirt': {
+      type: String,
+    },
+    'Hoodies': {
+      type: String,
+    },
+    'Zipper Hoodies': {
+      type: String,
+    },
+    'Jacket': {
       type: String,
     },
   },
@@ -132,7 +152,7 @@ const shoesSchema = new mongoose.Schema({
 });
 
 // Calculate final price (mrp - discount)
-shoesSchema.virtual('finalPrice').get(function() {
+poloSchema.virtual('finalPrice').get(function() {
   if (this.discountPercent > 0) {
     return this.mrp - (this.mrp * this.discountPercent / 100);
   }
@@ -140,23 +160,22 @@ shoesSchema.virtual('finalPrice').get(function() {
 });
 
 // Ensure virtuals are included in JSON output
-shoesSchema.set('toJSON', { virtuals: true });
-shoesSchema.set('toObject', { virtuals: true });
+poloSchema.set('toJSON', { virtuals: true });
+poloSchema.set('toObject', { virtuals: true });
 
 // Update timestamp before saving
-shoesSchema.pre('save', function (next) {
+poloSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
 // Indexes
-shoesSchema.index({ category: 1 });
-shoesSchema.index({ categoryId: 1 });
-shoesSchema.index({ title: 'text', description: 'text' });
-shoesSchema.index({ 'product_info.brand': 1 });
+poloSchema.index({ category: 1 });
+poloSchema.index({ categoryId: 1 });
+poloSchema.index({ title: 'text', description: 'text' });
+poloSchema.index({ 'product_info.brand': 1 });
 
-// Use 'Shoes' as the collection name
-const Shoes = mongoose.model('Shoes', shoesSchema, 'Shoes');
+// Use 'Polo' as the collection name
+const Polo = mongoose.model('Polo', poloSchema, 'Polo');
 
-export default Shoes;
-
+export default Polo;

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const menTshirtSchema = new mongoose.Schema({
+const hoodiesSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -23,8 +23,8 @@ const menTshirtSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['Tshirts', 'Tshirt', 'tshirt', 'TSHIRT'],
-    default: 'Tshirts',
+    enum: ['Hoodies', 'hoodies', 'HOODIES'],
+    default: 'Hoodies',
     required: true,
   },
   categoryId: {
@@ -152,7 +152,7 @@ const menTshirtSchema = new mongoose.Schema({
 });
 
 // Calculate final price (mrp - discount)
-menTshirtSchema.virtual('finalPrice').get(function() {
+hoodiesSchema.virtual('finalPrice').get(function() {
   if (this.discountPercent > 0) {
     return this.mrp - (this.mrp * this.discountPercent / 100);
   }
@@ -160,23 +160,23 @@ menTshirtSchema.virtual('finalPrice').get(function() {
 });
 
 // Ensure virtuals are included in JSON output
-menTshirtSchema.set('toJSON', { virtuals: true });
-menTshirtSchema.set('toObject', { virtuals: true });
+hoodiesSchema.set('toJSON', { virtuals: true });
+hoodiesSchema.set('toObject', { virtuals: true });
 
 // Update timestamp before saving
-menTshirtSchema.pre('save', function (next) {
+hoodiesSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
 // Indexes
-menTshirtSchema.index({ category: 1 });
-menTshirtSchema.index({ categoryId: 1 });
-menTshirtSchema.index({ title: 'text', description: 'text' });
-menTshirtSchema.index({ 'product_info.brand': 1 });
+hoodiesSchema.index({ category: 1 });
+hoodiesSchema.index({ categoryId: 1 });
+hoodiesSchema.index({ title: 'text', description: 'text' });
+hoodiesSchema.index({ 'product_info.brand': 1 });
 
-// Use 'MenTshirt' as the collection name
-const MenTshirt = mongoose.model('MenTshirt', menTshirtSchema, 'MenTshirt');
+// Use 'Hoodies' as the collection name
+const Hoodies = mongoose.model('Hoodies', hoodiesSchema, 'Hoodies');
 
-export default MenTshirt;
+export default Hoodies;
 

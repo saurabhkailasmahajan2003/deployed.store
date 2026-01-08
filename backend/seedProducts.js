@@ -1,10 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import Watch from './models/product/watch.model.js';
-import Lens from './models/product/lens.model.js';
-import Accessory from './models/product/accessory.model.js';
-import Men from './models/product/menModel.js';
-import Women from './models/product/womenModel.js';
+// Note: Old models (Watch, Lens, Accessory, Men, Women) have been removed
+// This seed file needs to be updated to use the new product models
 
 dotenv.config();
 
@@ -607,48 +604,11 @@ async function runSeed() {
     await mongoose.connect(MONGODB_URI);
     console.log('Connected to MongoDB Atlas');
 
-    // Always clear existing data before seeding fresh
-    console.log('Clearing existing product data...');
-    await Promise.all([
-      Watch.deleteMany({}),
-      Lens.deleteMany({}),
-      Accessory.deleteMany({}),
-      Men.deleteMany({}),
-      Women.deleteMany({}),
-    ]);
-    console.log('Existing product data cleared.');
-
-    console.log('Seeding products...');
-
-    // Insert watch products
-    for (const product of sampleProducts.watch) {
-      const createdWatch = await Watch.create(product);
-      console.log(`✅ Watch created: ${createdWatch.name}`);
-    }
-
-    // Insert lens products
-    for (const product of sampleProducts.lens) {
-      const createdLens = await Lens.create(product);
-      console.log(`✅ Lens created: ${createdLens.name}`);
-    }
-
-    // Insert men & women fashion products based on gender field
-    for (const product of sampleProducts.fashion) {
-      const gender = (product.gender || '').toLowerCase();
-      if (gender === 'women') {
-        const createdWomen = await Women.create(product);
-        console.log(`✅ Women product created: ${createdWomen.name}`);
-      } else {
-        const createdMen = await Men.create({ ...product, gender: 'men' });
-        console.log(`✅ Men product created: ${createdMen.name}`);
-      }
-    }
-
-    // Insert accessory products
-    for (const product of sampleProducts.accessory) {
-      const createdAccessory = await Accessory.create(product);
-      console.log(`✅ Accessory created: ${createdAccessory.name}`);
-    }
+    // Note: Seeding functionality disabled - old models have been removed
+    // Please update this file to use the new product models:
+    // - TShirt, FullSleeveTShirt, Polo, Oversized, CargoShirt, Sweatshirt, Hoodies, ZipperHoodies, Jacket, MenTshirt
+    console.log('⚠️  Seeding disabled - old models have been removed.');
+    console.log('Please update this file to use the new product models.');
 
 
     console.log('✅ Seeding completed successfully!');

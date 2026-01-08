@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const sareeSchema = new mongoose.Schema({
+const tShirtSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -23,7 +23,8 @@ const sareeSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    // Allow any category that contains saree/sari (e.g., "Banarasi Sarees", "Silk Saree", etc.)
+    enum: ['T-Shirt', 'Tshirt', 'tshirt', 'TSHIRT'],
+    default: 'T-Shirt',
     required: true,
   },
   categoryId: {
@@ -39,15 +40,27 @@ const sareeSchema = new mongoose.Schema({
       type: String,
       trim: true,
     },
-    SareeLength: {
+    tshirtSize: {
       type: String,
       trim: true,
     },
-    SareeMaterial: {
+    tshirtMaterial: {
       type: String,
       trim: true,
     },
-    SareeColor: {
+    tshirtFit: {
+      type: String,
+      trim: true,
+    },
+    tshirtSleeve: {
+      type: String,
+      trim: true,
+    },
+    tshirtNeck: {
+      type: String,
+      trim: true,
+    },
+    tshirtColor: {
       type: String,
       trim: true,
     },
@@ -57,16 +70,31 @@ const sareeSchema = new mongoose.Schema({
     },
   },
   images: {
-    image1: {
+    'T-Shirt': {
       type: String,
     },
-    image2: {
+    'Full Sleeve T-Shirt': {
       type: String,
     },
-    image3: {
+    'Polo': {
       type: String,
     },
-    image4: {
+    'Oversized': {
+      type: String,
+    },
+    'Cargo Shirt': {
+      type: String,
+    },
+    'Sweatshirt': {
+      type: String,
+    },
+    'Hoodies': {
+      type: String,
+    },
+    'Zipper Hoodies': {
+      type: String,
+    },
+    'Jacket': {
       type: String,
     },
   },
@@ -124,7 +152,7 @@ const sareeSchema = new mongoose.Schema({
 });
 
 // Calculate final price (mrp - discount)
-sareeSchema.virtual('finalPrice').get(function() {
+tShirtSchema.virtual('finalPrice').get(function() {
   if (this.discountPercent > 0) {
     return this.mrp - (this.mrp * this.discountPercent / 100);
   }
@@ -132,23 +160,22 @@ sareeSchema.virtual('finalPrice').get(function() {
 });
 
 // Ensure virtuals are included in JSON output
-sareeSchema.set('toJSON', { virtuals: true });
-sareeSchema.set('toObject', { virtuals: true });
+tShirtSchema.set('toJSON', { virtuals: true });
+tShirtSchema.set('toObject', { virtuals: true });
 
 // Update timestamp before saving
-sareeSchema.pre('save', function (next) {
+tShirtSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
 // Indexes
-sareeSchema.index({ category: 1 });
-sareeSchema.index({ categoryId: 1 });
-sareeSchema.index({ title: 'text', description: 'text' });
-sareeSchema.index({ 'product_info.brand': 1 });
+tShirtSchema.index({ category: 1 });
+tShirtSchema.index({ categoryId: 1 });
+tShirtSchema.index({ title: 'text', description: 'text' });
+tShirtSchema.index({ 'product_info.brand': 1 });
 
-// Use 'Saree' as the collection name
-const Saree = mongoose.model('Saree', sareeSchema, 'Saree');
+// Use 'TShirt' as the collection name
+const TShirt = mongoose.model('TShirt', tShirtSchema, 'TShirt');
 
-export default Saree;
-
+export default TShirt;

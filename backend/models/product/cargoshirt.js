@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const menTshirtSchema = new mongoose.Schema({
+const cargoShirtSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -23,8 +23,8 @@ const menTshirtSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['Tshirts', 'Tshirt', 'tshirt', 'TSHIRT'],
-    default: 'Tshirts',
+    enum: ['Cargo Shirt', 'CargoShirt', 'cargoshirt', 'CARGO SHIRT'],
+    default: 'Cargo Shirt',
     required: true,
   },
   categoryId: {
@@ -152,7 +152,7 @@ const menTshirtSchema = new mongoose.Schema({
 });
 
 // Calculate final price (mrp - discount)
-menTshirtSchema.virtual('finalPrice').get(function() {
+cargoShirtSchema.virtual('finalPrice').get(function() {
   if (this.discountPercent > 0) {
     return this.mrp - (this.mrp * this.discountPercent / 100);
   }
@@ -160,23 +160,23 @@ menTshirtSchema.virtual('finalPrice').get(function() {
 });
 
 // Ensure virtuals are included in JSON output
-menTshirtSchema.set('toJSON', { virtuals: true });
-menTshirtSchema.set('toObject', { virtuals: true });
+cargoShirtSchema.set('toJSON', { virtuals: true });
+cargoShirtSchema.set('toObject', { virtuals: true });
 
 // Update timestamp before saving
-menTshirtSchema.pre('save', function (next) {
+cargoShirtSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
 // Indexes
-menTshirtSchema.index({ category: 1 });
-menTshirtSchema.index({ categoryId: 1 });
-menTshirtSchema.index({ title: 'text', description: 'text' });
-menTshirtSchema.index({ 'product_info.brand': 1 });
+cargoShirtSchema.index({ category: 1 });
+cargoShirtSchema.index({ categoryId: 1 });
+cargoShirtSchema.index({ title: 'text', description: 'text' });
+cargoShirtSchema.index({ 'product_info.brand': 1 });
 
-// Use 'MenTshirt' as the collection name
-const MenTshirt = mongoose.model('MenTshirt', menTshirtSchema, 'MenTshirt');
+// Use 'CargoShirt' as the collection name
+const CargoShirt = mongoose.model('CargoShirt', cargoShirtSchema, 'CargoShirt');
 
-export default MenTshirt;
+export default CargoShirt;
 
